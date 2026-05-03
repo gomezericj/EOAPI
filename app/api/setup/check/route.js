@@ -6,9 +6,9 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  await dbConnect();
-  
   try {
+    await dbConnect();
+
     const adminCount = await User.countDocuments({ role: { $in: ['admin', 'superadmin'] } });
     const setting = await Setting.findOne();
     
