@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import './globals.css';
 import Sidebar from '@/components/Sidebar';
 import { NotificationProvider } from '@/context/NotificationContext';
@@ -18,7 +19,9 @@ export default function RootLayout({ children }) {
         <SessionWrapper>
           <BrandingProvider>
             <NotificationProvider>
-              <NavigationProgressBar />
+              <Suspense fallback={null}>
+                <NavigationProgressBar />
+              </Suspense>
               <AppContent>{children}</AppContent>
             </NotificationProvider>
           </BrandingProvider>
