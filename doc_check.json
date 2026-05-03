@@ -1,0 +1,31 @@
+{
+  "_id": "69adb9ac9b8c438bef9e1a77",
+  "date": "2026-02-02T00:00:00.000Z",
+  "__v": 0,
+  "cashTotal": 1925000,
+  "clinicalSaleTotal": 700000,
+  "createdAt": "2026-03-08T18:02:20.427Z",
+  "creditTotal": 0,
+  "debitTotal": 0,
+  "expensesTotal": 285629,
+  "insuranceTotal": 375000,
+  "isSent": false,
+  "netSubtotal": 1639371,
+  "pastDebtCollected": 1600000,
+  "pastTotals": {
+    "cash": 1225000,
+    "debit": 0,
+    "credit": 0,
+    "insurance": 375000
+  },
+  "pendingTotal": 0,
+  "todayTotals": {
+    "cash": 700000,
+    "debit": 0,
+    "credit": 0,
+    "insurance": 0
+  },
+  "totalCollectedGeneral": 2300000,
+  "totalPatients": 2,
+  "updatedAt": "2026-03-08T18:02:20.427Z"
+}

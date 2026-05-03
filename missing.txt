@@ -1,0 +1,4 @@
+c:\Users\gomez\.gemini\antigravity\scratch\ClinicaDental\app\api\especialidades\route.js
+c:\Users\gomez\.gemini\antigravity\scratch\ClinicaDental\app\api\insumos\route.js
+c:\Users\gomez\.gemini\antigravity\scratch\ClinicaDental\app\api\send-email\route.js
+c:\Users\gomez\.gemini\antigravity\scratch\ClinicaDental\app\api\ventas\[id]\pagos\route.js

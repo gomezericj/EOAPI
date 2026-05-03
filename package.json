@@ -1,0 +1,29 @@
+{
+  "name": "clinic-system",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "date-fns": "^4.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.577.0",
+    "mongoose": "^9.2.4",
+    "next": "16.1.6",
+    "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.13",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "recharts": "^3.8.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6"
+  }
+}

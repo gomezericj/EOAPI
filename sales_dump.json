@@ -1,0 +1,203 @@
+[
+  {
+    "_id": "69c463530944c9829a03fdcb",
+    "date": "2026-03-25T00:00:00.000Z",
+    "patientId": "69adbecdd47419dff55e9e61",
+    "patientName": "Paciente Prueba 5",
+    "procedures": [
+      {
+        "procedureId": "69b2240dd7c0c35ea527b9d2",
+        "procedureName": "Procedimiento Pueba eric",
+        "doctorId": "69adbecdd47419dff55e9e4b",
+        "doctorName": "D Prueba 4",
+        "unitPrice": 25000,
+        "quantity": 1,
+        "_id": "69c463530944c9829a03fdcc"
+      },
+      {
+        "procedureId": "69adbecdd47419dff55e9e8b",
+        "procedureName": "Procedimiento de Estética 6",
+        "doctorId": "69adbecdd47419dff55e9e53",
+        "doctorName": "Doctor Prueba 8",
+        "unitPrice": 300000,
+        "quantity": 1,
+        "_id": "69c463530944c9829a03fdcd"
+      },
+      {
+        "procedureId": "69adbecdd47419dff55e9e8f",
+        "procedureName": "Procedimiento de Estética 8",
+        "doctorId": "69adbecdd47419dff55e9e53",
+        "doctorName": "Doctor Prueba 8",
+        "unitPrice": 400000,
+        "quantity": 1,
+        "_id": "69c463530944c9829a03fdce"
+      }
+    ],
+    "discountId": "69adbecdd47419dff55e9ea7",
+    "discountName": "Insumo/Material Importado 10",
+    "discountQuantity": 1,
+    "discountPrice": 150000,
+    "discountTotal": 150000,
+    "totalToCollect": 725000,
+    "totalCharged": 720000,
+    "pendingAmount": 5000,
+    "clinicTotal": 575000,
+    "payments": [
+      {
+        "method": "efectivo",
+        "amount": 720000,
+        "_id": "69c463530944c9829a03fdcf",
+        "date": "2026-03-25T22:36:03.615Z"
+      }
+    ],
+    "status": "pendiente",
+    "isTreatmentInProgress": false,
+    "createdAt": "2026-03-25T22:36:03.623Z",
+    "updatedAt": "2026-03-25T22:36:03.623Z",
+    "__v": 0
+  },
+  {
+    "_id": "69add24fdef14fa691b3ef00",
+    "date": "2026-02-20T00:00:00.000Z",
+    "patientId": "69adbecdd47419dff55e9e5b",
+    "discountTotal": 0,
+    "totalToCollect": 1500000,
+    "totalCharged": 500000,
+    "pendingAmount": 1000000,
+    "clinicTotal": 1500000,
+    "payments": [
+      {
+        "date": "2026-02-20T00:00:00.000Z",
+        "method": "credito",
+        "amount": 500000,
+        "_id": "69add24fdef14fa691b3ef01"
+      }
+    ],
+    "status": "pendiente",
+    "isTreatmentInProgress": false,
+    "__v": 0,
+    "updatedAt": "2026-03-08T21:18:19.679Z",
+    "commissionReleaseDate": "2026-03-08T21:18:19.676Z",
+    "discountPrice": 0,
+    "discountQuantity": 0,
+    "patientName": "Paciente Prueba 2",
+    "procedures": [
+      {
+        "procedureId": "69adbecdd47419dff55e9e81",
+        "procedureName": "Procedimiento de Estética 1",
+        "doctorId": "69adbecdd47419dff55e9e4b",
+        "doctorName": "Doctor Prueba 4",
+        "unitPrice": 1500000,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "_id": "69add24fdef14fa691b3eefe",
+    "date": "2026-02-15T00:00:00.000Z",
+    "patientId": "69adbecdd47419dff55e9e5b",
+    "discountTotal": 0,
+    "totalToCollect": 1200000,
+    "totalCharged": 200000,
+    "pendingAmount": 1000000,
+    "clinicTotal": 1200000,
+    "payments": [
+      {
+        "date": "2026-02-15T00:00:00.000Z",
+        "method": "efectivo",
+        "amount": 200000,
+        "_id": "69add24fdef14fa691b3eeff"
+      }
+    ],
+    "status": "pendiente",
+    "isTreatmentInProgress": false,
+    "__v": 0,
+    "commissionReleaseDate": "2026-03-08T21:41:42.188Z",
+    "discountPrice": 0,
+    "discountQuantity": 0,
+    "updatedAt": "2026-03-08T21:39:12.927Z",
+    "patientName": "Paciente Prueba 2",
+    "procedures": [
+      {
+        "procedureId": "69adbecdd47419dff55e9e81",
+        "procedureName": "Procedimiento de Estética 1",
+        "doctorId": "69adbecdd47419dff55e9e4b",
+        "doctorName": "Doctor Prueba 4",
+        "unitPrice": 1200000,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "_id": "69adbeced47419dff55ea2cc",
+    "date": "2026-02-03T15:42:42.330Z",
+    "patientId": "69adbecdd47419dff55e9e7f",
+    "discountName": "Insumo/Material Importado 5",
+    "discountQuantity": 1,
+    "discountPrice": 75000,
+    "discountTotal": 75000,
+    "totalToCollect": 100000,
+    "totalCharged": 50000,
+    "pendingAmount": 50000,
+    "clinicTotal": 25000,
+    "payments": [
+      {
+        "date": "2026-02-03T15:42:42.330Z",
+        "method": "efectivo",
+        "amount": 50000,
+        "_id": "69adbeced47419dff55ea2cd"
+      }
+    ],
+    "status": "pendiente",
+    "createdAt": "2026-03-08T18:24:14.182Z",
+    "updatedAt": "2026-03-08T18:24:14.182Z",
+    "__v": 0,
+    "isTreatmentInProgress": false,
+    "procedures": [
+      {
+        "procedureId": "69adbecdd47419dff55e9e83",
+        "procedureName": "Procedimiento de Estética 2",
+        "doctorId": "69adbecdd47419dff55e9e4b",
+        "doctorName": null,
+        "unitPrice": 100000,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "_id": "69adbeced47419dff55ea2c9",
+    "date": "2026-01-20T04:12:25.101Z",
+    "patientId": "69adbecdd47419dff55e9e67",
+    "discountName": "Insumo/Material Importado 1",
+    "discountQuantity": 0,
+    "discountPrice": 0,
+    "discountTotal": 0,
+    "totalToCollect": 450000,
+    "totalCharged": 450000,
+    "pendingAmount": 0,
+    "clinicTotal": 450000,
+    "payments": [
+      {
+        "date": "2026-01-20T04:12:25.101Z",
+        "method": "seguro",
+        "amount": 450000,
+        "_id": "69adbeced47419dff55ea2ca"
+      }
+    ],
+    "status": "pagada",
+    "createdAt": "2026-03-08T18:24:14.181Z",
+    "updatedAt": "2026-03-08T18:24:14.181Z",
+    "__v": 0,
+    "isTreatmentInProgress": false,
+    "procedures": [
+      {
+        "procedureId": "69adbecdd47419dff55e9e91",
+        "procedureName": "Procedimiento de Estética 9",
+        "doctorId": "69adbecdd47419dff55e9e53",
+        "doctorName": null,
+        "unitPrice": 450000,
+        "quantity": 1
+      }
+    ]
+  }
+]
