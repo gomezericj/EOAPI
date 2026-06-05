@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const MONGODB_URI = "mongodb://localhost:27017/clinic_system";
+const MONGODB_URI = "mongodb+srv://estetica2l:140313se@cluster0.miuvcrk.mongodb.net/eo2l_db?appName=Cluster0";
 
 const runMigration = async () => {
   try {

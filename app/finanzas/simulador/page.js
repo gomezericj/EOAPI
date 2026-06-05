@@ -48,7 +48,6 @@ export default function RentabilidadSimuladorPage() {
 
   // Calculate the active commission to apply
   const activeDoctor = doctors.find(d => d._id === selectedDocId);
-  const activeCommissionPct = activeDoctor ? (activeDoctor.commissionPercentage || 0) : manualCommission;
 
   // Process data for the table
   let tableData = procedimientos.map(p => {
@@ -69,7 +68,21 @@ export default function RentabilidadSimuladorPage() {
     const margenBruto = price - costosFijos;
     const margenPct = price > 0 ? (margenBruto / price) * 100 : 0;
     
-    const comisionAmount = price * (activeCommissionPct / 100);
+    let currentCommissionPct = manualCommission;
+    let isSpecificSpecialty = false;
+
+    if (activeDoctor) {
+      currentCommissionPct = activeDoctor.defaultCommissionPercentage || 0;
+      if (p.specialty && activeDoctor.specialtyCommissions && activeDoctor.specialtyCommissions.length > 0) {
+        const specComm = activeDoctor.specialtyCommissions.find(sc => sc.specialty === p.specialty);
+        if (specComm) {
+          currentCommissionPct = specComm.percentage;
+          isSpecificSpecialty = true;
+        }
+      }
+    }
+    
+    const comisionAmount = price * (currentCommissionPct / 100);
     
     // Final profit to the clinic
     const neta = margenBruto - comisionAmount;
@@ -94,7 +107,9 @@ export default function RentabilidadSimuladorPage() {
       neta,
       netaPct,
       maxComisionPct,
-      isLosingMoney: neta < 0
+      isLosingMoney: neta < 0,
+      appliedCommissionPct: currentCommissionPct,
+      isSpecificSpecialty
     };
   });
 
@@ -130,7 +145,7 @@ export default function RentabilidadSimuladorPage() {
       [`Costo Instal. (${t.facilityPct}%) ($)`]: t.facilityTotal,
       'Margen Fijo Disponible ($)': t.margenBruto,
       'Margen Fijo Disponible (%)': t.margenPct.toFixed(1) + '%',
-      [`Comisión Simulada (${activeCommissionPct}%) ($)`]: t.comisionAmount,
+      [`Comisión Simulada (${t.appliedCommissionPct}%) ($)`]: t.comisionAmount,
       'Ganancia Clínica Neta ($)': t.neta,
       'Ganancia Clínica Neta (%)': t.netaPct.toFixed(1) + '%',
       'Estado': t.isLosingMoney ? 'PÉRDIDA' : 'RENTABLE',
@@ -173,7 +188,7 @@ export default function RentabilidadSimuladorPage() {
             >
               <option value="">-- Simulador Libre (Manual) --</option>
               {doctors.map(d => (
-                <option key={d._id} value={d._id}>{d.name} {d.surname} ({d.commissionPercentage}%)</option>
+                <option key={d._id} value={d._id}>{d.name} {d.surname} (Def: {d.defaultCommissionPercentage}%)</option>
               ))}
             </select>
           </div>
@@ -183,7 +198,7 @@ export default function RentabilidadSimuladorPage() {
             <input 
               type="number" 
               className="form-control" 
-              value={activeCommissionPct}
+              value={activeDoctor ? (activeDoctor.defaultCommissionPercentage || 0) : manualCommission}
               onChange={e => {
                 setSelectedDocId(''); // Switch to manual
                 setManualCommission(Number(e.target.value));
@@ -235,7 +250,7 @@ export default function RentabilidadSimuladorPage() {
                     <th style={{ textAlign: 'center', backgroundColor: '#eff6ff', color: '#1e3a8a', cursor: 'pointer' }} onClick={() => handleSort('margenBruto')}>
                       Margen Disp <ArrowUpDown size={12}/>
                     </th>
-                    <th style={{ textAlign: 'right', borderLeft: '1px dashed #cbd5e1' }}>Comisión Doc (-{activeCommissionPct}%)</th>
+                    <th style={{ textAlign: 'right', borderLeft: '1px dashed #cbd5e1' }}>Comisión Doc</th>
                     <th style={{ textAlign: 'right', fontWeight: 800, cursor: 'pointer', minWidth: '110px' }} onClick={() => handleSort('neta')}>
                       Ganancia Clínica <ArrowUpDown size={12}/>
                     </th>
@@ -263,8 +278,12 @@ export default function RentabilidadSimuladorPage() {
                           <div style={{ fontWeight: 600 }}>{formatCurrency(t.margenBruto)}</div>
                           <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>({t.margenPct.toFixed(1)}%)</div>
                         </td>
-                        <td style={{ textAlign: 'right', color: '#f59e0b', borderLeft: '1px dashed #cbd5e1', fontWeight: 600 }}>
-                          -{formatCurrency(t.comisionAmount)}
+                        <td style={{ textAlign: 'right', color: '#f59e0b', borderLeft: '1px dashed #cbd5e1' }}>
+                          <div style={{ fontWeight: 600 }}>-{formatCurrency(t.comisionAmount)}</div>
+                          <div style={{ fontSize: '0.75rem', opacity: 0.8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
+                            ({t.appliedCommissionPct}%)
+                            {t.isSpecificSpecialty && <span title="Porcentaje de Especialidad" style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--primary)' }}></span>}
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right', color: t.isLosingMoney ? '#ef4444' : '#10b981' }}>
                           <div style={{ fontWeight: 800 }}>{formatCurrency(t.neta)}</div>
