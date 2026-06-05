@@ -28,7 +28,8 @@ export async function POST(req) {
     const isUser = session.user.role === 'user';
     if (isUser) {
        // Override for non-admins to ensure defaults
-       data.commissionPercentage = 40;
+       data.defaultCommissionPercentage = 40;
+       data.specialtyCommissions = [];
        data.hasInvoice = false;
     }
 

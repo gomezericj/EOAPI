@@ -100,6 +100,21 @@ export async function PUT(req, { params }) {
     update.pendingAmount = update.totalToCollect - update.totalCharged;
     update.status = update.pendingAmount <= 0 ? 'pagada' : 'pendiente';
 
+    const finalDoctorId = update.doctorId || originalSale.doctorId;
+    const finalProcedureId = update.procedureId || originalSale.procedureId;
+    if (finalDoctorId && finalProcedureId) {
+      const procedure = await Procedure.findById(finalProcedureId);
+      const doctor = await Doctor.findById(finalDoctorId);
+      let doctorCommissionPercentage = doctor?.defaultCommissionPercentage || 0;
+      if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
+        const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
+        if (specComm) {
+          doctorCommissionPercentage = specComm.percentage;
+        }
+      }
+      update.doctorCommissionPercentage = doctorCommissionPercentage;
+    }
+
     // Force update at DB level to bypass Mongoose schema caching
     const directCollection = mongoose.connection.db.collection('sales');
     await directCollection.updateOne(

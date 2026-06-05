@@ -116,7 +116,7 @@ export async function GET(req) {
       totalInstalaciones += instalaciones;
 
       const subtotal = bruto - (sale.discountTotal || 0);
-      let doctorPct = sale.doctorId?.commissionPercentage || 0;
+      let doctorPct = sale.doctorCommissionPercentage || 0;
       let commissionAmount = subtotal * (doctorPct / 100);
       
       totalComisiones += commissionAmount;

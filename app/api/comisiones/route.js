@@ -62,8 +62,10 @@ export async function GET(req) {
       let totalFacturado = 0;
       let totalDescuentos = 0;
       let subtotal = 0;
+      let commissionAmount = 0;
 
       for (let s of sales) {
+        const pct = s.doctorCommissionPercentage || 0;
         if (s.commissionReleases && s.commissionReleases.length > 0) {
           const releasesThisMonth = s.commissionReleases.filter(r => r.date >= start && r.date <= end);
           for (let r of releasesThisMonth) {
@@ -71,6 +73,7 @@ export async function GET(req) {
              totalFacturado += (s.totalToCollect || 0) * proportion;
              totalDescuentos += (s.discountTotal || 0) * proportion;
              subtotal += r.amount;
+             commissionAmount += r.amount * (pct / 100);
           }
         } else {
           const matchLegacy = (
@@ -80,12 +83,12 @@ export async function GET(req) {
           if (matchLegacy) {
             totalFacturado += (s.totalToCollect || 0);
             totalDescuentos += (s.discountTotal || 0);
-            subtotal += (s.totalToCollect || 0) - (s.discountTotal || 0);
+            const lineSubtotal = (s.totalToCollect || 0) - (s.discountTotal || 0);
+            subtotal += lineSubtotal;
+            commissionAmount += lineSubtotal * (pct / 100);
           }
         }
       }
-
-      const commissionAmount = subtotal * (doctor.commissionPercentage / 100);
       const retention = !doctor.hasInvoice ? (commissionAmount * (retentionPercentage / 100)) : 0;
       const totalLiquid = commissionAmount - retention;
 

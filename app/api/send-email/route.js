@@ -37,7 +37,7 @@ export async function POST(req) {
             <li style="margin-bottom: 0.5rem;"><strong>Monto Total Facturado:</strong> $${(report.totals.totalFacturado || 0).toLocaleString('es-CL')}</li>
             <li style="margin-bottom: 0.5rem; color: #dc2626;"><strong>Total Descuentos:</strong> -$${(report.totals.totalDescuentos || 0).toLocaleString('es-CL')}</li>
             <li style="margin-bottom: 0.5rem; border-top: 1px solid #cbd5e1; padding-top: 0.5rem;"><strong>Subtotal (Neto):</strong> $${report.totals.subtotal.toLocaleString('es-CL')}</li>
-            <li style="margin-bottom: 0.5rem;"><strong>Comisión (${doctor.commissionPercentage}%):</strong> $${report.totals.commissionAmount.toLocaleString('es-CL')}</li>
+            <li style="margin-bottom: 0.5rem;"><strong>Comisión Generada:</strong> $${report.totals.commissionAmount.toLocaleString('es-CL')}</li>
             <li style="margin-bottom: 0.5rem; color: #dc2626;"><strong>Retención Aplicada (${report.retentionPercentage || 13}%):</strong> -$${Math.round(report.totals.retention).toLocaleString('es-CL')}</li>
             <li style="margin-top: 1rem; font-size: 1.2rem; color: #10b981;"><strong>Líquido a Pagar:</strong> $${Math.round(report.totals.totalLiquid).toLocaleString('es-CL')}</li>
           </ul>
@@ -53,6 +53,7 @@ export async function POST(req) {
               <th>Total</th>
               <th>Desc.</th>
               <th>Subtotal</th>
+              <th>% Com.</th>
               <th>C.Bruta</th>
               <th>Ret. (${report.retentionPercentage || 13}%)</th>
               <th>Líquido</th>
@@ -60,7 +61,7 @@ export async function POST(req) {
           </thead>
           <tbody>
             ${report.sales.map(s => {
-              const lineComm = s.clinicTotal * (report.doctor.commissionPercentage / 100);
+              const lineComm = s.calculatedCommission !== undefined ? s.calculatedCommission : (s.clinicTotal || s.totalToCollect - (s.discountTotal || 0)) * ((s.doctorCommissionPercentage || 0) / 100);
               const lineRet = !report.doctor.hasInvoice ? (lineComm * ((report.retentionPercentage || 13) / 100)) : 0;
               const lineLiq = lineComm - lineRet;
               
@@ -75,6 +76,7 @@ export async function POST(req) {
                   <td>$${(s.totalToCollect || 0).toLocaleString('es-CL')}</td>
                   <td style="color: #dc2626;">-$${(s.discountTotal || 0).toLocaleString('es-CL')}</td>
                   <td>$${(s.clinicTotal || 0).toLocaleString('es-CL')}</td>
+                  <td>${s.doctorCommissionPercentage || 0}%</td>
                   <td>$${Math.round(lineComm).toLocaleString('es-CL')}</td>
                   <td style="color: #ef4444;">-$${Math.round(lineRet).toLocaleString('es-CL')}</td>
                   <td style="font-weight: bold; color: #10b981;">$${Math.round(lineLiq).toLocaleString('es-CL')}</td>
@@ -86,6 +88,7 @@ export async function POST(req) {
               <td>$${(report.totals.totalFacturado || 0).toLocaleString('es-CL')}</td>
               <td style="color: #dc2626;">-$${(report.totals.totalDescuentos || 0).toLocaleString('es-CL')}</td>
               <td>$${(report.totals.subtotal || 0).toLocaleString('es-CL')}</td>
+              <td></td>
               <td>$${Math.round(report.totals.commissionAmount || 0).toLocaleString('es-CL')}</td>
               <td style="color: #ef4444;">-$${Math.round(report.totals.retention || 0).toLocaleString('es-CL')}</td>
               <td style="color: #10b981;">$${Math.round(report.totals.totalLiquid || 0).toLocaleString('es-CL')}</td>

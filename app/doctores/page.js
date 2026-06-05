@@ -25,9 +25,8 @@ export default function DoctorsPage() {
     age: '',
     email: '',
     phone: '',
-    specialty1: '',
-    specialty2: '',
-    commissionPercentage: '40',
+    specialtyCommissions: [],
+    defaultCommissionPercentage: '40',
     hasInvoice: false
   });
 
@@ -79,8 +78,8 @@ export default function DoctorsPage() {
         setShowModal(false);
         setFormData({
           rut: '', name: '', secondName: '', surname: '', secondSurname: '',
-          age: '', email: '', phone: '', specialty1: '', specialty2: '',
-          commissionPercentage: '40', hasInvoice: false
+          age: '', email: '', phone: '', specialtyCommissions: [],
+          defaultCommissionPercentage: '40', hasInvoice: false
         });
         await fetchDoctors();
         showSuccess(formData._id ? 'Doctor actualizado' : 'Doctor registrado');
@@ -108,9 +107,9 @@ export default function DoctorsPage() {
       Edad: d.age || '',
       Correo: d.email || '',
       Teléfono: d.phone || '',
-      Especialidad_1: d.specialty1,
-      Especialidad_2: d.specialty2 || '',
-      Comision_Pct: `${d.commissionPercentage}%`,
+      Especialidad_1: d.specialtyCommissions && d.specialtyCommissions.length > 0 ? d.specialtyCommissions[0].specialty : '',
+      Especialidad_2: d.specialtyCommissions && d.specialtyCommissions.length > 1 ? d.specialtyCommissions[1].specialty : '',
+      Comision_Defecto: `${d.defaultCommissionPercentage}%`,
       Factura: d.hasInvoice ? 'Sí' : 'No',
       Estado: d.isActive !== false ? 'Activo' : 'Deshabilitado'
     }));
@@ -130,8 +129,8 @@ export default function DoctorsPage() {
         <button className="btn btn-primary" onClick={() => {
           setFormData({
             rut: '', name: '', secondName: '', surname: '', secondSurname: '',
-            age: '', email: '', phone: '', specialty1: '', specialty2: '',
-            commissionPercentage: '40', hasInvoice: false
+            age: '', email: '', phone: '', specialtyCommissions: [],
+            defaultCommissionPercentage: '40', hasInvoice: false
           });
           setShowModal(true);
         }}>
@@ -184,13 +183,16 @@ export default function DoctorsPage() {
                 </td>
                 <td>
                   <div style={{ fontSize: '0.85rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Award size={12} /> {d.specialty1}</div>
-                    {d.specialty2 && <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Award size={12} /> {d.specialty2}</div>}
+                    {d.specialtyCommissions && d.specialtyCommissions.map((sc, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '2px' }}>
+                        <Award size={12} /> {sc.specialty} ({sc.percentage}%)
+                      </div>
+                    ))}
                   </div>
                 </td>
                 <td>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}>
-                    <Percent size={14} /> {d.commissionPercentage}%
+                    <Percent size={14} /> {d.defaultCommissionPercentage}% (Defecto)
                   </span>
                 </td>
                 <td>
@@ -219,9 +221,8 @@ export default function DoctorsPage() {
                           age: d.age || '',
                           email: d.email || '',
                           phone: d.phone || '',
-                          specialty1: d.specialty1 || '',
-                          specialty2: d.specialty2 || '',
-                          commissionPercentage: d.commissionPercentage || '',
+                          specialtyCommissions: d.specialtyCommissions || [],
+                          defaultCommissionPercentage: d.defaultCommissionPercentage || '40',
                           hasInvoice: d.hasInvoice || false,
                           _id: d._id
                         });
@@ -301,29 +302,53 @@ export default function DoctorsPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Primera Especialidad</label>
-                    <select className="form-control" value={formData.specialty1} onChange={e => setFormData({ ...formData, specialty1: e.target.value })} required>
-                      <option value="">Seleccione...</option>
-                      {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
-                    </select>
+                <div style={{ marginTop: '1rem', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
+                  <h4>Comisiones por Especialidad</h4>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label className="form-label">Comisión por Defecto (%)</label>
+                    <input type="number" className="form-control" value={formData.defaultCommissionPercentage} onChange={e => setFormData({ ...formData, defaultCommissionPercentage: e.target.value })} disabled={!isAdmin} required />
+                    <small style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>Se aplicará a procedimientos que no coincidan con las especialidades abajo detalladas.</small>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Segunda Especialidad</label>
-                    <select className="form-control" value={formData.specialty2} onChange={e => setFormData({ ...formData, specialty2: e.target.value })}>
-                      <option value="">Ninguna / Seleccione...</option>
-                      {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
-                    </select>
-                  </div>
+                  
+                  {formData.specialtyCommissions.map((sc, idx) => (
+                    <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '1rem', alignItems: 'end', marginBottom: '0.5rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Especialidad</label>
+                        <select className="form-control" value={sc.specialty} onChange={e => {
+                          const newCommissions = [...formData.specialtyCommissions];
+                          newCommissions[idx].specialty = e.target.value;
+                          setFormData({ ...formData, specialtyCommissions: newCommissions });
+                        }} required>
+                          <option value="">Seleccione...</option>
+                          {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Comisión (%)</label>
+                        <input type="number" className="form-control" value={sc.percentage} onChange={e => {
+                          const newCommissions = [...formData.specialtyCommissions];
+                          newCommissions[idx].percentage = e.target.value;
+                          setFormData({ ...formData, specialtyCommissions: newCommissions });
+                        }} disabled={!isAdmin} required />
+                      </div>
+                      <button type="button" className="btn-action-delete" onClick={() => {
+                        const newCommissions = formData.specialtyCommissions.filter((_, i) => i !== idx);
+                        setFormData({ ...formData, specialtyCommissions: newCommissions });
+                      }} disabled={!isAdmin} style={{ padding: '0.5rem' }}><Trash2 size={18} /></button>
+                    </div>
+                  ))}
+                  
+                  {isAdmin && (
+                    <button type="button" className="btn" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }} onClick={() => {
+                      setFormData({ ...formData, specialtyCommissions: [...formData.specialtyCommissions, { specialty: '', percentage: formData.defaultCommissionPercentage }] });
+                    }}>
+                      <Plus size={14} /> Añadir Especialidad
+                    </button>
+                  )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Porcentaje Comisión (%)</label>
-                    <input type="number" className="form-control" value={formData.commissionPercentage} onChange={e => setFormData({ ...formData, commissionPercentage: e.target.value })} disabled={!isAdmin} required />
-                  </div>
-                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', marginTop: '2rem', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', marginTop: '1rem', gap: '0.5rem' }}>
                     <input type="checkbox" id="hasInvoice" checked={formData.hasInvoice} onChange={e => setFormData({ ...formData, hasInvoice: e.target.checked })} disabled={!isAdmin} />
                     <label htmlFor="hasInvoice" className="form-label" style={{ marginBottom: 0 }}>¿Emite Factura? (Si NO emite factura, aplica Retención {systemRetention}% Boleta)</label>
                   </div>

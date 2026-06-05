@@ -21,7 +21,7 @@ export async function PUT(req, { params }) {
 
     // Security check: user cannot edit commission or invoice
     if (!isAdmin) {
-      if (data.commissionPercentage !== undefined || data.hasInvoice !== undefined) {
+      if (data.defaultCommissionPercentage !== undefined || data.specialtyCommissions !== undefined || data.hasInvoice !== undefined) {
          return NextResponse.json({ error: 'No tiene permisos para modificar la comisión o facturación del doctor.' }, { status: 403 });
       }
     }

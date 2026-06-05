@@ -14,6 +14,7 @@ const SaleSchema = new mongoose.Schema({
   quantity: { type: Number, default: 1 },
   doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' },
   doctorName: { type: String }, // Cache in case doctor is deleted
+  doctorCommissionPercentage: { type: Number, required: true, default: 0 },
   patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient' },
   patientName: { type: String }, // Cache in case patient is deleted
   

@@ -114,7 +114,7 @@ export default function Sidebar({ user, isOpen, setIsOpen }) {
     }}>
       <div className="sidebar-header" style={{ marginBottom: '2.5rem', paddingLeft: '0.5rem', textAlign: 'center' }}>
         {branding?.logoBase64 ? (
-          <img src={branding.logoBase64} alt={branding?.clinicName || 'Logo'} style={{ maxWidth: '80%', maxHeight: '100px', height: 'auto', marginBottom: '0.5rem', objectFit: 'contain' }} />
+          <img src={branding.logoBase64} alt={branding?.clinicName || 'Logo'} style={{ width: '90px', height: '90px', borderRadius: '50%', marginBottom: '1rem', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.2)', backgroundColor: 'white' }} />
         ) : (
           <div style={{ padding: '1rem', border: '2px dashed rgba(255,255,255,0.3)', borderRadius: '8px', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{branding?.clinicName || 'Clínica'}</span>

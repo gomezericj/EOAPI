@@ -115,7 +115,7 @@ export default function ComisionesPage() {
               <h3 style={{ margin: 0 }}>${report?.totals?.subtotal?.toLocaleString('es-CL') || '0'}</h3>
             </div>
             <div className="card" style={{ borderLeft: '4px solid var(--secondary)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Comisión ({report?.doctor?.commissionPercentage || 0}%)</small>
+              <small style={{ color: 'var(--text-light)' }}>Comisión Generada</small>
               <h3 style={{ margin: 0 }}>${report?.totals?.commissionAmount?.toLocaleString('es-CL') || '0'}</h3>
             </div>
             <div className="card" style={{ borderLeft: '4px solid #ef4444' }}>
@@ -145,6 +145,7 @@ export default function ComisionesPage() {
                     <th>Monto Total</th>
                     <th>Descuento</th>
                     <th>Subtotal</th>
+                    <th>% Com.</th>
                     <th>Com. Bruta</th>
                     <th>Retención ({report?.retentionPercentage || 13}%)</th>
                     <th style={{ textAlign: 'right' }}>Com. Líquido</th>
@@ -152,7 +153,7 @@ export default function ComisionesPage() {
                 </thead>
                 <tbody>
                   {report?.sales?.map((s, idx) => {
-                    const lineComm = s.clinicTotal * (report.doctor.commissionPercentage / 100);
+                    const lineComm = s.calculatedCommission !== undefined ? s.calculatedCommission : (s.clinicTotal || s.totalToCollect - (s.discountTotal || 0)) * ((s.doctorCommissionPercentage || 0) / 100);
                     const lineRet = !report.doctor.hasInvoice ? (lineComm * ((report.retentionPercentage || 13) / 100)) : 0;
                     const lineLiq = lineComm - lineRet;
                     
@@ -162,7 +163,7 @@ export default function ComisionesPage() {
                         <td>{s.patientId?.name || 'Invitado'} {s.patientId?.surname || ''}</td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            {s.procedureName}
+                            {s.procedureId?.name || s.procedureName}
                             {s.commissionReleaseDate && !s.isPartialRelease && (
                               <span style={{ 
                                 backgroundColor: 'var(--success-bg)', 
@@ -199,6 +200,7 @@ export default function ComisionesPage() {
                         <td>${(s.totalToCollect || 0).toLocaleString('es-CL')}</td>
                         <td style={{ color: 'var(--danger)' }}>-${(s.discountTotal || 0).toLocaleString('es-CL')}</td>
                         <td>${(s.clinicTotal || 0).toLocaleString('es-CL')}</td>
+                        <td>{s.doctorCommissionPercentage || 0}%</td>
                         <td>${Math.round(lineComm).toLocaleString('es-CL')}</td>
                         <td style={{ color: '#ef4444' }}>-${Math.round(lineRet).toLocaleString('es-CL')}</td>
                         <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--success)' }}>
@@ -212,6 +214,7 @@ export default function ComisionesPage() {
                     <td>${report?.totals?.totalFacturado?.toLocaleString('es-CL') || '0'}</td>
                     <td style={{ color: 'var(--danger)' }}>-${report?.totals?.totalDescuentos?.toLocaleString('es-CL') || '0'}</td>
                     <td>${report?.totals?.subtotal?.toLocaleString('es-CL') || '0'}</td>
+                    <td></td>
                     <td>${Math.round(report?.totals?.commissionAmount || 0).toLocaleString('es-CL')}</td>
                     <td style={{ color: '#ef4444' }}>-${Math.round(report?.totals?.retention || 0).toLocaleString('es-CL')}</td>
                     <td style={{ textAlign: 'right', color: 'var(--success)', fontSize: '1.2rem' }}>

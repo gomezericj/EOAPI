@@ -50,14 +50,16 @@ export async function GET(req, { params }) {
           'commissionReleases.date': { $gte: start, $lte: end }
         }
       ]
-    }).populate('patientId', 'name surname');
+    }).populate('patientId', 'name surname').populate('procedureId', 'name');
 
     const reportSales = [];
     let totalFacturado = 0;
     let totalDescuentos = 0;
     let subtotal = 0;
+    let commissionAmount = 0;
 
     for (let s of sales) {
+      const pct = s.doctorCommissionPercentage || 0;
       if (s.commissionReleases && s.commissionReleases.length > 0) {
         const releasesThisMonth = s.commissionReleases.filter(r => r.date >= start && r.date <= end);
         for (let r of releasesThisMonth) {
@@ -68,6 +70,8 @@ export async function GET(req, { params }) {
            totalFacturado += facturadoPorcion;
            totalDescuentos += descuentoPorcion;
            subtotal += r.amount;
+           const lineComm = r.amount * (pct / 100);
+           commissionAmount += lineComm;
 
            // Add a customized clone of the sale for the report array
            reportSales.push({
@@ -80,7 +84,9 @@ export async function GET(req, { params }) {
              partialReleaseAmount: r.amount,
              originalClinicTotal: s.clinicTotal,
              originalTotalToCollect: s.totalToCollect,
-             releasePercentage: Math.round(proportion * 100)
+             releasePercentage: Math.round(proportion * 100),
+             doctorCommissionPercentage: pct,
+             calculatedCommission: lineComm
            });
         }
       } else {
@@ -91,13 +97,19 @@ export async function GET(req, { params }) {
         if (matchLegacy) {
           totalFacturado += (s.totalToCollect || 0);
           totalDescuentos += (s.discountTotal || 0);
-          subtotal += (s.totalToCollect || 0) - (s.discountTotal || 0);
-          reportSales.push(s);
+          const lineSubtotal = (s.totalToCollect || 0) - (s.discountTotal || 0);
+          subtotal += lineSubtotal;
+          const lineComm = lineSubtotal * (pct / 100);
+          commissionAmount += lineComm;
+          
+          const sObj = s.toObject();
+          sObj.doctorCommissionPercentage = pct;
+          sObj.calculatedCommission = lineComm;
+          reportSales.push(sObj);
         }
       }
     }
     
-    const commissionAmount = subtotal * (doctor.commissionPercentage / 100);
     const retention = !doctor.hasInvoice ? (commissionAmount * (retentionPercentage / 100)) : 0;
     const totalLiquid = commissionAmount - retention;
 

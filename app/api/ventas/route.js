@@ -96,6 +96,7 @@ export async function POST(req) {
 
     let costsSnapshot = { suppliesTotal: 0, adminCost: 0, facilityCost: 0, netProfit: 0 };
     const procedure = await Procedure.findById(data.procedureId);
+    const doctor = await Doctor.findById(data.doctorId);
     
     if (procedure && procedure.costs) {
       const suppliesTotal = (procedure.costs.suppliesAndEquipment || []).reduce((acc, s) => acc + (s.price * (s.quantity || 1)), 0);
@@ -109,6 +110,14 @@ export async function POST(req) {
       };
     }
 
+    let doctorCommissionPercentage = doctor?.defaultCommissionPercentage || 0;
+    if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
+      const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
+      if (specComm) {
+        doctorCommissionPercentage = specComm.percentage;
+      }
+    }
+
     const sale = await Sale.create({
       ...data,
       discountId: data.discountId === '' ? null : data.discountId,
@@ -118,12 +127,12 @@ export async function POST(req) {
       totalCharged,
       pendingAmount,
       status,
-      costsSnapshot
+      costsSnapshot,
+      doctorCommissionPercentage
     });
 
-    // Fetch names for logs
+    // Fetch patient for logs
     const patient = await Patient.findById(sale.patientId);
-    const doctor = await Doctor.findById(sale.doctorId);
 
     const patientName = patient ? `${patient.name} ${patient.surname || ''}`.trim() : 'Desconocido';
     const doctorName = doctor ? `${doctor.name} ${doctor.surname || ''}`.trim() : 'Desconocido';

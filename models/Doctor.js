@@ -9,9 +9,11 @@ const DoctorSchema = new mongoose.Schema({
   age: { type: Number },
   email: { type: String },
   phone: { type: String },
-  specialty1: { type: String },
-  specialty2: { type: String },
-  commissionPercentage: { type: Number, default: 0 },
+  specialtyCommissions: [{
+    specialty: { type: String },
+    percentage: { type: Number, default: 0 }
+  }],
+  defaultCommissionPercentage: { type: Number, default: 0 },
   hasInvoice: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
