@@ -111,6 +111,24 @@ export default function IntegrationsPage() {
     setShowModal(true);
   };
 
+  const fillN8nDefaults = () => {
+    const existing = connections.find(c => c.systemKey === 'N8N_SALES_WEBHOOK' || c.provider?.toLowerCase().includes('n8n'));
+    
+    const n8nDefaults = {
+      description: "Webhook que se dispara cuando se crea una nueva venta en la clínica."
+    };
+
+    setFormData({
+      ...(existing || formData),
+      provider: 'n8n Automations',
+      systemKey: 'N8N_SALES_WEBHOOK',
+      baseUrl: '', 
+      isActive: existing ? existing.isActive : false
+    });
+    setSettingsJson(JSON.stringify(n8nDefaults, null, 2));
+    setShowModal(true);
+  };
+
   const handleToggle = async (conn) => {
     try {
       const res = await fetch(`/api/apiconnections/${conn._id}`, {
@@ -150,8 +168,11 @@ export default function IntegrationsPage() {
           <p style={{ color: 'var(--text-light)' }}>Gestiona las conexiones con software de terceros (Dentalink, Pagos, etc.)</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className="btn btn-secondary" onClick={fillN8nDefaults}>
+            <Code size={18} /> Plantilla n8n
+          </button>
           <button className="btn btn-secondary" onClick={fillDentalinkDefaults}>
-            <Code size={18} /> Cargar Plantilla Dentalink
+            <Code size={18} /> Plantilla Dentalink
           </button>
           <button className="btn btn-primary" onClick={() => {
             setFormData({ provider: '', systemKey: '', environment: 'PROD', baseUrl: '', apiKey: '', clientId: '', clientSecret: '', isActive: false, settings: {} });

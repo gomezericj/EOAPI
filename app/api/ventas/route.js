@@ -5,6 +5,7 @@ import Patient from '@/models/Patient'; // Ensure models are registered
 import Procedure from '@/models/Procedure';
 import Doctor from '@/models/Doctor';
 import Supply from '@/models/Supply';
+import ApiConnection from '@/models/ApiConnection';
 import { isDayClosed } from '@/lib/closureCheck';
 import { NextResponse } from 'next/server';
 import { createLog } from '@/lib/logger';
@@ -145,6 +146,39 @@ export async function POST(req) {
       entityId: sale._id,
       details: `Agregó venta de ${sale.totalToCollect} del procedimiento ${procedureName} para el paciente ${patientName} con el doctor ${doctorName}`
     });
+
+    try {
+      const n8nConnection = await ApiConnection.findOne({ systemKey: 'N8N_SALES_WEBHOOK', isActive: true });
+      if (n8nConnection && n8nConnection.baseUrl) {
+        const payloadParaN8n = {
+          evento: "nueva_venta",
+          ventaId: sale._id,
+          pacienteNombre: patientName,
+          pacienteRut: patient?.rut || "",
+          pacienteTelefono: patient?.phone || "",
+          pacienteCorreo: patient?.email || "",
+          doctorNombre: doctorName,
+          procedimiento: procedureName,
+          totalCobrado: sale.totalToCollect,
+          totalPagadoHastaAhora: sale.totalCharged,
+          estado: sale.status,
+          fecha: sale.date
+        };
+
+        const headers = { "Content-Type": "application/json" };
+        if (n8nConnection.apiKey) {
+          headers["Authorization"] = `Bearer ${n8nConnection.apiKey}`;
+        }
+
+        fetch(n8nConnection.baseUrl, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payloadParaN8n)
+        }).catch(err => console.error("Error contactando a n8n:", err));
+      }
+    } catch (error) {
+      console.error("Error verificando integración n8n:", error);
+    }
 
     return NextResponse.json(sale, { status: 201 });
   } catch (error) {
