@@ -180,7 +180,7 @@ export default function Dashboard() {
           </div>
           <div style={{ height: '8px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginTop: '0.5rem', position: 'relative' }}>
             {isCurrentMonth && (
-              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#cbd5e1', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#fca5a5', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
             )}
             <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(metaProgress, 100)}%`, backgroundColor: 'var(--warning)', borderRadius: '4px', transition: 'width 1s ease-in-out', zIndex: 1 }}></div>
           </div>
