@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Save, Palette } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
+import { useBranding } from '@/context/BrandingContext';
 
 export default function MarcaPage() {
   const { data: session } = useSession();
@@ -11,6 +12,7 @@ export default function MarcaPage() {
   const [logoBase64, setLogoBase64] = useState('');
   const [primaryColor, setPrimaryColor] = useState('#0ea5e9');
   const [loading, setLoading] = useState(true);
+  const { setBranding } = useBranding();
 
   useEffect(() => {
     fetch('/api/settings')
@@ -102,14 +104,22 @@ export default function MarcaPage() {
             <input 
               type="color" 
               value={primaryColor} 
-              onChange={e => setPrimaryColor(e.target.value)} 
+              onChange={e => {
+                setPrimaryColor(e.target.value);
+                setBranding(prev => ({ ...prev, primaryColor: e.target.value }));
+              }} 
               style={{ width: '60px', height: '50px', padding: '0', cursor: 'pointer', borderRadius: '8px', border: '1px solid var(--border)' }} 
             />
             <input 
               type="text" 
               className="form-control" 
               value={primaryColor} 
-              onChange={e => setPrimaryColor(e.target.value)} 
+              onChange={e => {
+                setPrimaryColor(e.target.value);
+                if (/^#([0-9A-F]{3}){1,2}$/i.test(e.target.value)) {
+                  setBranding(prev => ({ ...prev, primaryColor: e.target.value }));
+                }
+              }} 
               placeholder="#000000"
               style={{ fontFamily: 'monospace', textTransform: 'uppercase', width: '150px' }}
             />

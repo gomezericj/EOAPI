@@ -3,38 +3,30 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const BrandingContext = createContext(null);
 
-export const BrandingProvider = ({ children }) => {
-  const [branding, setBranding] = useState({
+export const BrandingProvider = ({ children, initialBranding }) => {
+  const [branding, setBranding] = useState(initialBranding || {
     clinicName: 'Clínica Dental',
     logoBase64: '',
     primaryColor: '#0ea5e9'
   });
 
+  // Si el usuario cambia el color desde la interfaz, lo aplicamos de inmediato al root HTML
   useEffect(() => {
-    fetch('/api/setup/check')
-      .then(res => res.json())
-      .then(data => {
-        if (data.setting) {
-          setBranding({
-            clinicName: data.setting.clinicName || 'Clínica Dental',
-            logoBase64: data.setting.logoBase64 || '',
-            primaryColor: data.setting.primaryColor || '#0ea5e9'
-          });
-        }
-      })
-      .catch(console.error);
-  }, []);
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.setProperty('--primary', branding.primaryColor);
+    }
+  }, [branding.primaryColor]);
 
   return (
-    <BrandingContext.Provider value={branding}>
-      <style dangerouslySetInnerHTML={{__html: `
-        :root {
-          --primary: ${branding.primaryColor};
-        }
-      `}} />
+    <BrandingContext.Provider value={{ branding, setBranding }}>
       {children}
     </BrandingContext.Provider>
   );
 };
 
-export const useBranding = () => useContext(BrandingContext);
+export const useBranding = () => {
+  const context = useContext(BrandingContext);
+  // Compatibilidad: antes retornaba directamente "branding", ahora retorna { branding, setBranding }
+  // Para no romper otras partes del código que esperan solo el objeto branding, devolvemos el objeto extendido.
+  return { ...context.branding, setBranding: context.setBranding };
+};
