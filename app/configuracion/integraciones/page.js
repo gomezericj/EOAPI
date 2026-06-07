@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useNotification } from '@/context/NotificationContext';
-import { Settings, Save, Link as LinkIcon, Trash2, ToggleLeft, ToggleRight, Plus, Code, Info } from 'lucide-react';
+import { Settings, Save, Link as LinkIcon, Trash2, ToggleLeft, ToggleRight, Plus, Code, Info, Blocks, Workflow, Database, X } from 'lucide-react';
 import Portal from '@/components/Portal';
 
 export default function IntegrationsPage() {
@@ -15,6 +15,7 @@ export default function IntegrationsPage() {
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const [formData, setFormData] = useState({
     provider: '', systemKey: '', environment: 'PROD', baseUrl: '', apiKey: '', clientId: '', clientSecret: '', isActive: false, settings: {}
   });
@@ -168,17 +169,7 @@ export default function IntegrationsPage() {
           <p style={{ color: 'var(--text-light)' }}>Gestiona las conexiones con software de terceros (Dentalink, Pagos, etc.)</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button className="btn btn-secondary" onClick={fillN8nDefaults}>
-            <Code size={18} /> Plantilla n8n
-          </button>
-          <button className="btn btn-secondary" onClick={fillDentalinkDefaults}>
-            <Code size={18} /> Plantilla Dentalink
-          </button>
-          <button className="btn btn-primary" onClick={() => {
-            setFormData({ provider: '', systemKey: '', environment: 'PROD', baseUrl: '', apiKey: '', clientId: '', clientSecret: '', isActive: false, settings: {} });
-            setSettingsJson('{}');
-            setShowModal(true);
-          }}>
+          <button className="btn btn-primary" onClick={() => setShowGallery(true)}>
             <Plus size={20} /> Nueva Integración
           </button>
         </div>
@@ -291,7 +282,66 @@ export default function IntegrationsPage() {
           70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
           100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+        .hover-card:hover {
+          border-color: var(--primary) !important;
+          background-color: #f8fafc;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
       `}</style>
+
+      {showGallery && (
+        <Portal>
+          <div className="modal-overlay">
+            <div className="card" style={{ width: '600px', padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ margin: 0 }}>Catálogo de Integraciones</h2>
+                <button className="btn-icon" onClick={() => setShowGallery(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} color="#64748b" /></button>
+              </div>
+              <p style={{ color: '#64748b', marginBottom: '2rem' }}>Selecciona el servicio que deseas conectar con tu clínica.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {/* Dentalink */}
+                <div 
+                  onClick={() => { setShowGallery(false); fillDentalinkDefaults(); }}
+                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s' }}
+                  className="hover-card"
+                >
+                  <Database size={32} color="#0284c7" />
+                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>Dentalink</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Sincronización de pacientes, evoluciones y agendas médicas.</p>
+                </div>
+
+                {/* n8n */}
+                <div 
+                  onClick={() => { setShowGallery(false); fillN8nDefaults(); }}
+                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s' }}
+                  className="hover-card"
+                >
+                  <Workflow size={32} color="#ea580c" />
+                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>n8n Webhooks</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Automatizaciones cuando se registran ventas u otros eventos.</p>
+                </div>
+
+                {/* Personalizada */}
+                <div 
+                  onClick={() => { 
+                    setShowGallery(false); 
+                    setFormData({ provider: '', systemKey: '', environment: 'PROD', baseUrl: '', apiKey: '', clientId: '', clientSecret: '', isActive: false, settings: {} });
+                    setSettingsJson('{}');
+                    setShowModal(true); 
+                  }}
+                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s', gridColumn: '1 / -1', backgroundColor: '#f1f5f9' }}
+                  className="hover-card"
+                >
+                  <Blocks size={32} color="#475569" />
+                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>Integración Personalizada</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Conecta cualquier otra API configurando los parámetros desde cero.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
 
       {showModal && (
         <Portal>
