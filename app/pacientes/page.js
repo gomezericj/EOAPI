@@ -25,7 +25,7 @@ export default function PatientsPage() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [searching, setSearching] = useState(false);
-  const [isDentalinkActive, setIsDentalinkActive] = useState(false);
+
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyData, setHistoryData] = useState(null);
