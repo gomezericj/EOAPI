@@ -5,13 +5,13 @@ import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
+import useSWR, { mutate } from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function PatientsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin';
   const { showAlert, showConfirm, showSuccess, showLoading } = useNotification();
-  const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     rut: '',
@@ -85,24 +85,16 @@ export default function PatientsPage() {
     }
   };
 
+  const { data: patientsData } = useSWR('/api/patients', fetcher);
+  const { data: connsData } = useSWR('/api/apiconnections', fetcher);
+
+  const patients = patientsData || [];
+  const loading = !patientsData;
+  const isDentalinkActive = connsData?.find(c => c.provider?.toLowerCase() === 'dentalink')?.isActive || false;
+
   const fetchPatients = async () => {
-    const res = await fetch('/api/patients', { cache: 'no-store' });
-    const data = await res.json();
-    setPatients(data);
-    
-    try {
-      const apiRes = await fetch('/api/apiconnections');
-      const conns = await apiRes.json();
-      const dink = conns.find(c => c.provider?.toLowerCase() === 'dentalink');
-      setIsDentalinkActive(!!(dink && dink.isActive));
-    } catch(err){}
-
-    setLoading(false);
+    await mutate('/api/patients');
   };
-
-  useEffect(() => {
-    fetchPatients();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -5,6 +5,8 @@ import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
+import useSWR, { mutate } from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function SalesPage() {
   const { data: session } = useSession();
@@ -12,13 +14,6 @@ export default function SalesPage() {
   const isSuperAdmin = session?.user?.role === 'superadmin';
   const isUser = session?.user?.role === 'user';
   const { showAlert, showConfirm, showSuccess, showLoading } = useNotification();
-  const [sales, setSales] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [doctors, setDoctors] = useState([]);
-  const [procedures, setProcedures] = useState([]);
-  const [supplies, setSupplies] = useState([]);
-  const [closedDates, setClosedDates] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showAbonoModal, setShowAbonoModal] = useState(false);
   const [abonoPatientId, setAbonoPatientId] = useState('');
@@ -69,43 +64,33 @@ export default function SalesPage() {
     patientId: ''
   });
 
-  const fetchData = async () => {
-    try {
-      showLoading(true);
-      let url = '/api/ventas';
-      const params = new URLSearchParams();
-      if (filters.startDate) params.append('startDate', filters.startDate);
-      if (filters.endDate) params.append('endDate', filters.endDate);
-      if (filters.doctorId) params.append('doctorId', filters.doctorId);
-      if (filters.patientId) params.append('patientId', filters.patientId);
-      if (params.toString()) url += `?${params.toString()}`;
+  const params = new URLSearchParams();
+  if (filters.startDate) params.append('startDate', filters.startDate);
+  if (filters.endDate) params.append('endDate', filters.endDate);
+  if (filters.doctorId) params.append('doctorId', filters.doctorId);
+  if (filters.patientId) params.append('patientId', filters.patientId);
+  const salesUrl = `/api/ventas${params.toString() ? '?' + params.toString() : ''}`;
 
-      const [sRes, pRes, dRes, prRes, supRes, cRes] = await Promise.all([
-        fetch(url), fetch('/api/patients'), fetch('/api/doctors'), fetch('/api/procedimientos'), fetch('/api/insumos'), fetch('/api/cierres')
-      ]);
-      const [salesData, patientsData, doctorsData, proceduresData, suppliesData, closedData] = await Promise.all([
-        sRes.json(), pRes.json(), dRes.json(), prRes.json(), supRes.json(), cRes.json()
-      ]);
-      setSales(salesData);
-      setPatients(patientsData);
-      setDoctors(doctorsData);
-      setProcedures(proceduresData);
-      setSupplies(suppliesData);
-      setClosedDates(Array.isArray(closedData) ? closedData : []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      showAlert('Error al cargar datos');
-    } finally {
-      setLoading(false);
-      showLoading(false);
-    }
+  const { data: salesData } = useSWR(salesUrl, fetcher);
+  const { data: patientsData } = useSWR('/api/patients', fetcher);
+  const { data: doctorsData } = useSWR('/api/doctors', fetcher);
+  const { data: proceduresData } = useSWR('/api/procedimientos', fetcher);
+  const { data: suppliesData } = useSWR('/api/insumos', fetcher);
+  const { data: closedData } = useSWR('/api/cierres', fetcher);
+
+  const sales = salesData || [];
+  const patients = patientsData || [];
+  const doctors = doctorsData || [];
+  const procedures = proceduresData || [];
+  const supplies = suppliesData || [];
+  const closedDates = Array.isArray(closedData) ? closedData : [];
+  const loading = !salesData || !patientsData || !doctorsData || !proceduresData || !suppliesData || !closedData;
+
+  const fetchData = async () => {
+    await mutate(salesUrl);
   };
 
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const requestSort = (key) => {
     let direction = 'asc';
@@ -503,18 +488,16 @@ export default function SalesPage() {
     });
   };
 
+  const { data: abonoSales } = useSWR(abonoPatientId ? `/api/ventas?patientId=${abonoPatientId}` : null, fetcher);
+
   useEffect(() => {
-    if (abonoPatientId) {
-      fetch(`/api/ventas?patientId=${abonoPatientId}`)
-        .then(res => res.json())
-        .then(data => {
-          setPatientPendingSales(data.filter(s => Number(s.pendingAmount) > 0));
-        });
-    } else {
+    if (abonoPatientId && abonoSales) {
+      setPatientPendingSales(abonoSales.filter(s => Number(s.pendingAmount) > 0));
+    } else if (!abonoPatientId) {
       setPatientPendingSales([]);
       setAbonoForm(prev => ({ ...prev, saleId: '' }));
     }
-  }, [abonoPatientId]);
+  }, [abonoSales, abonoPatientId]);
 
   const handleAbonoSubmit = async (e) => {
     e.preventDefault();

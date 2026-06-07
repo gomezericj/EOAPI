@@ -12,4 +12,7 @@ const PatientSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
+PatientSchema.index({ rut: 1 });
+PatientSchema.index({ name: 1, surname: 1 });
+
 export default mongoose.models.Patient || mongoose.model('Patient', PatientSchema);

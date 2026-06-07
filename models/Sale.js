@@ -52,6 +52,11 @@ const SaleSchema = new mongoose.Schema({
   commissionReleasedTotal: { type: Number, default: 0 }
 }, { timestamps: true });
 
+SaleSchema.index({ date: -1 });
+SaleSchema.index({ status: 1 });
+SaleSchema.index({ patientId: 1 });
+SaleSchema.index({ doctorId: 1 });
+
 delete mongoose.models.Sale;
 delete mongoose.connection.models.Sale;
 export default mongoose.models.Sale || mongoose.model('Sale', SaleSchema);

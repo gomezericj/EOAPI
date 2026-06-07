@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Mail, Calendar, DollarSign, Users, CreditCard, Shield, TrendingDown, TrendingUp, CheckCircle2, Trash2 } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function CierresPage() {
   const { data: session } = useSession();
@@ -11,23 +13,11 @@ export default function CierresPage() {
   const now = new Date();
   const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const [date, setDate] = useState(localToday);
-  const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
   const displayDate = new Date(date + 'T12:00:00').toLocaleDateString('es-CL');
 
-  const fetchReport = async () => {
-    setLoading(true);
-    const res = await fetch(`/api/cierres/${date}`);
-    const data = await res.json();
-    setReport(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchReport();
-  }, [date]);
+  const { data: report, isLoading: loading, mutate: fetchReport } = useSWR(`/api/cierres/${date}`, fetcher);
 
   const handleSaveClosure = async () => {
     setSaving(true);

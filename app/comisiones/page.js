@@ -2,19 +2,18 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Mail, Calendar, Calculator, FileText, TrendingDown, TrendingUp } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function ComisionesPage() {
   const { showAlert, showSuccess, showLoading } = useNotification();
-  const [doctors, setDoctors] = useState([]);
+  const { data: doctorsData } = useSWR('/api/doctors', fetcher);
+  const doctors = doctorsData || [];
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/doctors').then(res => res.json()).then(setDoctors);
-  }, []);
 
   const handleGenerateReport = async () => {
     if (!selectedDoctor) return showAlert('Seleccione un doctor o Reporte Global');

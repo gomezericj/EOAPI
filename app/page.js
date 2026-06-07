@@ -12,85 +12,62 @@ import {
   AlertCircle 
 } from 'lucide-react';
 
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
+
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    totalSales: 0,
-    totalPatients: 0,
-    monthlySales: 0,
-    chargedPayments: 0,
-    pendingPayments: 0,
-    currentMeta: 10000000,
-    recentSales: [],
-    paymentMethods: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
-    expenses: { total: 0, valePersonal: 0, gastoClinica: 0, otro: 0 }
-  });
   const [selectedMonth, setSelectedMonth] = useState(
     `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
   );
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const [year, month] = selectedMonth.split('-');
-        const startDate = new Date(year, parseInt(month) - 1, 1).toISOString().split('T')[0];
-        const endDate = new Date(year, parseInt(month), 0).toISOString().split('T')[0];
-        
-        const params = new URLSearchParams({ startDate, endDate });
-        
-        const [sRes, targetsRes, egresosRes] = await Promise.all([
-          fetch(`/api/ventas?${params.toString()}`),
-          fetch('/api/metas'),
-          fetch(`/api/egresos?${params.toString()}`)
-        ]);
-        
-        const sales = await sRes.json();
-        const targets = await targetsRes.json();
-        const egresosData = await egresosRes.json();
-        
-        const target = Array.isArray(targets) ? targets.find(t => t.year === parseInt(year) && t.month === parseInt(month)) : null;
-        const currentMeta = target ? target.amount : 10000000;
-        
-        const total = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.totalToCollect || 0), 0) : 0;
-        const charged = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.totalCharged || 0), 0) : 0;
-        const pending = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.pendingAmount || 0), 0) : 0;
-        
-        const expensesBreakdown = Array.isArray(egresosData) ? egresosData.reduce((acc, curr) => {
-          const amt = curr.amount || 0;
-          if (curr.type === 'Vale Personal') acc.valePersonal += amt;
-          else if (curr.type === 'Gasto Clínica' || curr.type === 'Gasto Clinica') acc.gastoClinica += amt;
-          else acc.otro += amt;
-          acc.total += amt;
-          return acc;
-        }, { total: 0, valePersonal: 0, gastoClinica: 0, otro: 0 }) : { total: 0, valePersonal: 0, gastoClinica: 0, otro: 0 };
+  const [year, month] = selectedMonth.split('-');
+  const startDate = new Date(year, parseInt(month) - 1, 1).toISOString().split('T')[0];
+  const endDate = new Date(year, parseInt(month), 0).toISOString().split('T')[0];
+  const paramsStr = new URLSearchParams({ startDate, endDate }).toString();
 
-        setStats(prev => ({
-          ...prev,
-          totalSales: total,
-          monthlySales: total,
-          chargedPayments: charged,
-          pendingPayments: pending,
-          totalPatients: Array.isArray(sales) ? new Set(sales.map(s => s.patientId?._id)).size : 0,
-          recentSales: Array.isArray(sales) ? sales.slice(0, 5) : [],
-          currentMeta: currentMeta,
-          paymentMethods: Array.isArray(sales) ? sales.reduce((acc, sale) => {
-            if (sale.payments) {
-              sale.payments.forEach(p => {
-                const m = p.method?.toLowerCase()?.trim();
-                const amt = Number(p.amount) || 0;
-                if (m === 'efecitvo' || m === 'efectivo') acc.efectivo += amt;
-                else if (acc.hasOwnProperty(m)) acc[m] += amt;
-              });
-            }
-            return acc;
-          }, { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 }) : { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
-          expenses: expensesBreakdown
-        }));
-      } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-      }
-    };
-    fetchDashboard();
-  }, [selectedMonth]);
+  const { data: sales } = useSWR(`/api/ventas?${paramsStr}`, fetcher);
+  const { data: targets } = useSWR('/api/metas', fetcher);
+  const { data: egresosData } = useSWR(`/api/egresos?${paramsStr}`, fetcher);
+
+  const target = Array.isArray(targets) ? targets.find(t => t.year === parseInt(year) && t.month === parseInt(month)) : null;
+  const currentMeta = target ? target.amount : 10000000;
+
+  const total = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.totalToCollect || 0), 0) : 0;
+  const charged = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.totalCharged || 0), 0) : 0;
+  const pending = Array.isArray(sales) ? sales.reduce((acc, s) => acc + (s.pendingAmount || 0), 0) : 0;
+
+  const expensesBreakdown = Array.isArray(egresosData) ? egresosData.reduce((acc, curr) => {
+    const amt = curr.amount || 0;
+    if (curr.type === 'Vale Personal') acc.valePersonal += amt;
+    else if (curr.type === 'Gasto Clínica' || curr.type === 'Gasto Clinica') acc.gastoClinica += amt;
+    else acc.otro += amt;
+    acc.total += amt;
+    return acc;
+  }, { total: 0, valePersonal: 0, gastoClinica: 0, otro: 0 }) : { total: 0, valePersonal: 0, gastoClinica: 0, otro: 0 };
+
+  const paymentMethods = Array.isArray(sales) ? sales.reduce((acc, sale) => {
+    if (sale.payments) {
+      sale.payments.forEach(p => {
+        const m = p.method?.toLowerCase()?.trim();
+        const amt = Number(p.amount) || 0;
+        if (m === 'efecitvo' || m === 'efectivo') acc.efectivo += amt;
+        else if (acc.hasOwnProperty(m)) acc[m] += amt;
+      });
+    }
+    return acc;
+  }, { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 }) : { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 };
+
+  const stats = {
+    totalSales: total,
+    monthlySales: total,
+    chargedPayments: charged,
+    pendingPayments: pending,
+    totalPatients: Array.isArray(sales) ? new Set(sales.map(s => s.patientId?._id)).size : 0,
+    recentSales: Array.isArray(sales) ? sales.slice(0, 5) : [],
+    currentMeta: currentMeta,
+    paymentMethods,
+    expenses: expensesBreakdown
+  };
 
   const metaProgress = (stats.monthlySales / stats.currentMeta) * 100;
 
