@@ -332,7 +332,7 @@ export default function DoctorsPage() {
                           const newCommissions = [...formData.specialtyCommissions];
                           newCommissions[idx].specialty = e.target.value;
                           setFormData({ ...formData, specialtyCommissions: newCommissions });
-                        }} required>
+                        }} disabled={!isAdmin} required>
                           <option value="">Seleccione...</option>
                           {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
                         </select>
@@ -345,10 +345,12 @@ export default function DoctorsPage() {
                           setFormData({ ...formData, specialtyCommissions: newCommissions });
                         }} disabled={!isAdmin} required />
                       </div>
-                      <button type="button" className="btn-action-delete" onClick={() => {
-                        const newCommissions = formData.specialtyCommissions.filter((_, i) => i !== idx);
-                        setFormData({ ...formData, specialtyCommissions: newCommissions });
-                      }} disabled={!isAdmin} style={{ padding: '0.5rem' }}><Trash2 size={18} /></button>
+                      {isAdmin && (
+                        <button type="button" className="btn-action-delete" onClick={() => {
+                          const newCommissions = formData.specialtyCommissions.filter((_, i) => i !== idx);
+                          setFormData({ ...formData, specialtyCommissions: newCommissions });
+                        }} style={{ padding: '0.5rem' }}><Trash2 size={18} /></button>
+                      )}
                     </div>
                   ))}
                   
