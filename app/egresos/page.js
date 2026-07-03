@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, DollarSign, User, Tag, Edit, Search, Download } from 'lucide-react';
+import { Plus, Trash2, DollarSign, User, Tag, Edit, Search, Download, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -257,7 +257,10 @@ export default function ExpensesPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '450px' }}>
+            <div className="card" style={{ width: '450px' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2>Registrar Egreso</h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">

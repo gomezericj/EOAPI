@@ -111,11 +111,20 @@ export async function POST(req) {
       };
     }
 
+    // Fetch patient
+    const patient = await Patient.findById(data.patientId);
+
     let doctorCommissionPercentage = doctor?.defaultCommissionPercentage || 0;
-    if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
-      const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
-      if (specComm) {
-        doctorCommissionPercentage = specComm.percentage;
+    
+    // Check if it's a referred patient
+    if (patient && patient.referredByDoctorId && doctor && patient.referredByDoctorId.toString() === doctor._id.toString()) {
+      doctorCommissionPercentage = doctor.referredPatientCommissionPercentage || 0;
+    } else {
+      if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
+        const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
+        if (specComm) {
+          doctorCommissionPercentage = specComm.percentage;
+        }
       }
     }
 
@@ -131,9 +140,6 @@ export async function POST(req) {
       costsSnapshot,
       doctorCommissionPercentage
     });
-
-    // Fetch patient for logs
-    const patient = await Patient.findById(sale.patientId);
 
     const patientName = patient ? `${patient.name} ${patient.surname || ''}`.trim() : 'Desconocido';
     const doctorName = doctor ? `${doctor.name} ${doctor.surname || ''}`.trim() : 'Desconocido';

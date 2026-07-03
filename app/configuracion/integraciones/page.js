@@ -346,7 +346,10 @@ export default function IntegrationsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Settings color="var(--primary)" />
                 {formData._id ? 'Editar Integración' : 'Nueva Integración'}

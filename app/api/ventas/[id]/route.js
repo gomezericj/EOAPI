@@ -102,14 +102,21 @@ export async function PUT(req, { params }) {
 
     const finalDoctorId = update.doctorId || originalSale.doctorId;
     const finalProcedureId = update.procedureId || originalSale.procedureId;
-    if (finalDoctorId && finalProcedureId) {
+    const finalPatientId = update.patientId || originalSale.patientId;
+    if (finalDoctorId && finalProcedureId && finalPatientId) {
       const procedure = await Procedure.findById(finalProcedureId);
       const doctor = await Doctor.findById(finalDoctorId);
+      const patient = await Patient.findById(finalPatientId);
       let doctorCommissionPercentage = doctor?.defaultCommissionPercentage || 0;
-      if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
-        const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
-        if (specComm) {
-          doctorCommissionPercentage = specComm.percentage;
+      
+      if (patient && patient.referredByDoctorId && doctor && patient.referredByDoctorId.toString() === doctor._id.toString()) {
+        doctorCommissionPercentage = doctor.referredPatientCommissionPercentage || 0;
+      } else {
+        if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
+          const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
+          if (specComm) {
+            doctorCommissionPercentage = specComm.percentage;
+          }
         }
       }
       update.doctorCommissionPercentage = doctorCommissionPercentage;

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Package, Trash2, Tag, Truck, Edit, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Search, Package, Trash2, Tag, Truck, Edit, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 
@@ -204,7 +204,14 @@ export default function SuppliesPage() {
           backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }}>
-          <div className="card" style={{ width: '500px' }}>
+          <div className="card" style={{ width: '500px', position: 'relative' }}>
+            <button 
+              type="button"
+              onClick={() => setShowModal(false)}
+              style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}
+            >
+              <X size={20} />
+            </button>
             <h2>{formData._id ? 'Editar Descuento/Costo' : 'Registrar Descuento o Costo'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">

@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
 import useSWR, { mutate } from 'swr';
 import { fetcher } from '@/lib/fetcher';
+import Select from 'react-select';
 
 export default function PatientsPage() {
   const { data: session } = useSession();
@@ -21,7 +22,8 @@ export default function PatientsPage() {
     secondSurname: '',
     age: '',
     email: '',
-    phone: ''
+    phone: '',
+    referredByDoctorId: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [searching, setSearching] = useState(false);
@@ -87,8 +89,10 @@ export default function PatientsPage() {
 
   const { data: patientsData } = useSWR('/api/patients', fetcher);
   const { data: connsData } = useSWR('/api/apiconnections', fetcher);
+  const { data: doctorsData } = useSWR('/api/doctors', fetcher);
 
   const patients = patientsData || [];
+  const doctors = doctorsData || [];
   const loading = !patientsData;
   const isDentalinkActive = connsData?.find(c => c.provider?.toLowerCase() === 'dentalink')?.isActive || false;
 
@@ -112,7 +116,7 @@ export default function PatientsPage() {
         setShowModal(false);
         setFormData({
           rut: '', name: '', secondName: '', surname: '', secondSurname: '',
-          age: '', email: '', phone: ''
+          age: '', email: '', phone: '', referredByDoctorId: ''
         });
         await fetchPatients();
         showSuccess(formData._id ? 'Paciente actualizado' : 'Paciente registrado');
@@ -157,7 +161,7 @@ export default function PatientsPage() {
           <p style={{ color: 'var(--text-light)' }}>Listado y registro de clientes</p>
         </div>
         <button className="btn btn-primary" onClick={() => {
-          setFormData({ rut: '', name: '', surname: '', email: '', phone: '', secondName: '', secondSurname: '' });
+          setFormData({ rut: '', name: '', surname: '', email: '', phone: '', secondName: '', secondSurname: '', referredByDoctorId: '' });
           setShowModal(true);
         }}>
           <Plus size={20} />
@@ -268,7 +272,14 @@ export default function PatientsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+              <button 
+                type="button"
+                onClick={() => setShowModal(false)}
+                style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}
+              >
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar Paciente' : 'Registrar Paciente'}</h2>
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -330,6 +341,20 @@ export default function PatientsPage() {
                     <label className="form-label">Teléfono</label>
                     <input type="text" className="form-control" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} required />
                   </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Referido por (Opcional)</label>
+                  <Select
+                    instanceId="referredBy-select"
+                    placeholder="Seleccione doctor..."
+                    noOptionsMessage={() => "No se encontraron doctores"}
+                    options={doctors.filter(d => d.isActive !== false).map(d => ({ value: d._id, label: `${d.name} ${d.surname}` }))}
+                    value={formData.referredByDoctorId ? { value: formData.referredByDoctorId, label: doctors.find(d => d._id === formData.referredByDoctorId) ? `${doctors.find(d => d._id === formData.referredByDoctorId).name} ${doctors.find(d => d._id === formData.referredByDoctorId).surname}` : 'Doctor' } : null}
+                    onChange={option => setFormData({ ...formData, referredByDoctorId: option ? option.value : '' })}
+                    styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
+                    isClearable
+                    menuPosition="fixed"
+                  />
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
                   <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Star, Trash2, Edit, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Search, Star, Trash2, Edit, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
@@ -145,7 +145,10 @@ export default function SpecialtiesPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '400px' }}>
+            <div className="card" style={{ width: '400px' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar Especialidad' : 'Registrar Especialidad'}</h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">

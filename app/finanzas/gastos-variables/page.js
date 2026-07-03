@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit, Save } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
@@ -124,7 +124,10 @@ export default function GastosVariablesPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '500px' }}>
+            <div className="card" style={{ width: '500px' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar' : 'Nuevo'} Gasto Variable</h2>
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'flex', gap: '1rem' }}>

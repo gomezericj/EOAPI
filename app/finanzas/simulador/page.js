@@ -17,6 +17,7 @@ export default function RentabilidadSimuladorPage() {
   // State for the Simulation
   const [selectedDocId, setSelectedDocId] = useState('');
   const [manualCommission, setManualCommission] = useState(0); // If no doctor selected
+  const [isReferredPatient, setIsReferredPatient] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'neta', direction: 'desc' });
 
@@ -72,12 +73,17 @@ export default function RentabilidadSimuladorPage() {
     let isSpecificSpecialty = false;
 
     if (activeDoctor) {
-      currentCommissionPct = activeDoctor.defaultCommissionPercentage || 0;
-      if (p.specialty && activeDoctor.specialtyCommissions && activeDoctor.specialtyCommissions.length > 0) {
-        const specComm = activeDoctor.specialtyCommissions.find(sc => sc.specialty === p.specialty);
-        if (specComm) {
-          currentCommissionPct = specComm.percentage;
-          isSpecificSpecialty = true;
+      if (isReferredPatient) {
+        currentCommissionPct = activeDoctor.referredPatientCommissionPercentage || 0;
+        isSpecificSpecialty = true; // Highlight as override
+      } else {
+        currentCommissionPct = activeDoctor.defaultCommissionPercentage || 0;
+        if (p.specialty && activeDoctor.specialtyCommissions && activeDoctor.specialtyCommissions.length > 0) {
+          const specComm = activeDoctor.specialtyCommissions.find(sc => sc.specialty === p.specialty);
+          if (specComm) {
+            currentCommissionPct = specComm.percentage;
+            isSpecificSpecialty = true;
+          }
         }
       }
     }
@@ -198,9 +204,10 @@ export default function RentabilidadSimuladorPage() {
             <input 
               type="number" 
               className="form-control" 
-              value={activeDoctor ? (activeDoctor.defaultCommissionPercentage || 0) : manualCommission}
+              value={activeDoctor ? (isReferredPatient ? (activeDoctor.referredPatientCommissionPercentage || 0) : (activeDoctor.defaultCommissionPercentage || 0)) : manualCommission}
               onChange={e => {
                 setSelectedDocId(''); // Switch to manual
+                setIsReferredPatient(false);
                 setManualCommission(Number(e.target.value));
               }}
               style={{ margin: 0, fontWeight: 'bold', color: 'var(--primary)', textAlign: 'center' }}
@@ -208,6 +215,20 @@ export default function RentabilidadSimuladorPage() {
               disabled={selectedDocId !== ''}
             />
           </div>
+          
+          {selectedDocId && (
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', marginBottom: '0.2rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', margin: 0, fontWeight: 600, color: 'var(--primary)' }}>
+                <input 
+                  type="checkbox" 
+                  checked={isReferredPatient} 
+                  onChange={e => setIsReferredPatient(e.target.checked)} 
+                  style={{ width: '1.2rem', height: '1.2rem' }}
+                />
+                Simular como Paciente Referido
+              </label>
+            </div>
+          )}
         </div>
         {!selectedDocId && (
           <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>

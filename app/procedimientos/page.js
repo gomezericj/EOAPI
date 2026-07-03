@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, ClipboardList, DollarSign, Trash2, Edit, Download, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Search, ClipboardList, DollarSign, Trash2, Edit, Download, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -226,7 +226,14 @@ export default function ProceduresPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '500px' }}>
+            <div className="card" style={{ width: '500px', position: 'relative' }}>
+              <button 
+                type="button"
+                onClick={() => setShowModal(false)}
+                style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}
+              >
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar Procedimiento' : 'Registrar Procedimiento'}</h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">

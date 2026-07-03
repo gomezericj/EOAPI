@@ -14,6 +14,7 @@ const DoctorSchema = new mongoose.Schema({
     percentage: { type: Number, default: 0 }
   }],
   defaultCommissionPercentage: { type: Number, default: 0 },
+  referredPatientCommissionPercentage: { type: Number, default: 0 },
   hasInvoice: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });

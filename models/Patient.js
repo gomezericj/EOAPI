@@ -10,6 +10,7 @@ const PatientSchema = new mongoose.Schema({
   email: { type: String },
   phone: { type: String },
   isActive: { type: Boolean, default: true },
+  referredByDoctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' },
 }, { timestamps: true });
 
 PatientSchema.index({ rut: 1 });

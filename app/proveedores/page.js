@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Truck, Phone, MapPin, Edit, Trash2, Download, ToggleLeft, ToggleRight, Briefcase, CreditCard } from 'lucide-react';
+import { Plus, Search, Truck, Phone, MapPin, Edit, Trash2, Download, ToggleLeft, ToggleRight, Briefcase, CreditCard, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -201,7 +201,10 @@ export default function ProvidersPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar Proveedor' : 'Registrar Proveedor'}</h2>
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

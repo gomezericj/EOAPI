@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
 import useSWR, { mutate } from 'swr';
 import { fetcher } from '@/lib/fetcher';
+import Select from 'react-select';
 
 export default function SalesPage() {
   const { data: session } = useSession();
@@ -942,14 +943,25 @@ export default function SalesPage() {
                         <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
                           <User size={14} /> Paciente
                         </label>
-                        <select className="form-control" style={{ padding: '0.5rem' }} value={formData.patientId} disabled={!formData._id && formData.proceduresList && formData.proceduresList.length > 0} onChange={e => {
-                          const id = e.target.value;
-                          const p = patients.find(pat => pat._id === id);
-                          setFormData({ ...formData, patientId: id, patientName: p ? `${p.name} ${p.surname}` : '' });
-                        }} required>
-                          <option value="">Seleccione un paciente...</option>
-                          {patients.filter(p => p.isActive !== false || p._id === formData.patientId).map(p => <option key={p._id} value={p._id}>{p.rut} - {p.name} {p.surname}</option>)}
-                        </select>
+                        <Select
+                          instanceId="patient-select"
+                          isDisabled={!formData._id && formData.proceduresList && formData.proceduresList.length > 0}
+                          placeholder="Seleccione un paciente..."
+                          noOptionsMessage={() => "No se encontraron pacientes"}
+                          options={patients.filter(p => p.isActive !== false || p._id === formData.patientId).map(p => ({ value: p._id, label: `${p.rut} - ${p.name} ${p.surname}` }))}
+                          value={formData.patientId ? { value: formData.patientId, label: patients.find(pat => pat._id === formData.patientId) ? `${patients.find(pat => pat._id === formData.patientId).rut} - ${patients.find(pat => pat._id === formData.patientId).name} ${patients.find(pat => pat._id === formData.patientId).surname}` : formData.patientName } : null}
+                          onChange={option => {
+                            if (option) {
+                              const p = patients.find(pat => pat._id === option.value);
+                              setFormData({ ...formData, patientId: option.value, patientName: p ? `${p.name} ${p.surname}` : '' });
+                            } else {
+                              setFormData({ ...formData, patientId: '', patientName: '' });
+                            }
+                          }}
+                          styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
+                          menuPosition="fixed"
+                          isClearable
+                        />
                       </div>
                     </div>
 
@@ -963,23 +975,38 @@ export default function SalesPage() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1rem' }}>
                         <div className="form-group" style={{ marginBottom: '0.5rem' }}>
                           <label className="form-label" style={{ fontSize: '0.8rem' }}>Procedimiento</label>
-                          <select className="form-control" style={{ padding: '0.5rem' }} value={formData.procedureId} onChange={handleProcedureChange} required={!formData.proceduresList?.length}>
-                            <option value="">Seleccione Procedimiento...</option>
-                            {procedures.filter(p => p.isActive !== false || p._id === formData.procedureId).map(p => (
-                              <option key={p._id} value={p._id}>{p.name} (${p.price.toLocaleString('es-CL')})</option>
-                            ))}
-                          </select>
+                          <Select
+                            instanceId="procedure-select"
+                            placeholder="Seleccione Procedimiento..."
+                            noOptionsMessage={() => "No se encontraron procedimientos"}
+                            options={procedures.filter(p => p.isActive !== false || p._id === formData.procedureId).map(p => ({ value: p._id, label: `${p.name} ($${p.price.toLocaleString('es-CL')})` }))}
+                            value={formData.procedureId ? { value: formData.procedureId, label: procedures.find(p => p._id === formData.procedureId) ? `${procedures.find(p => p._id === formData.procedureId).name} ($${procedures.find(p => p._id === formData.procedureId).price.toLocaleString('es-CL')})` : formData.procedureName } : null}
+                            onChange={option => handleProcedureChange({ target: { value: option ? option.value : '' } })}
+                            styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
+                            menuPosition="fixed"
+                            isClearable
+                          />
                         </div>
                         <div className="form-group" style={{ marginBottom: '0.5rem' }}>
                           <label className="form-label" style={{ fontSize: '0.8rem' }}>Doctor</label>
-                          <select className="form-control" style={{ padding: '0.5rem' }} value={formData.doctorId} onChange={e => {
-                            const id = e.target.value;
-                            const doc = doctors.find(d => d._id === id);
-                            setFormData({ ...formData, doctorId: id, doctorName: doc ? `${doc.name} ${doc.surname}` : '' });
-                          }} required={!formData.proceduresList?.length}>
-                            <option value="">Asignar Doctor...</option>
-                            {doctors.filter(d => d.isActive !== false || d._id === formData.doctorId).map(d => <option key={d._id} value={d._id}>{d.name} {d.surname}</option>)}
-                          </select>
+                          <Select
+                            instanceId="doctor-select"
+                            placeholder="Asignar Doctor..."
+                            noOptionsMessage={() => "No se encontraron doctores"}
+                            options={doctors.filter(d => d.isActive !== false || d._id === formData.doctorId).map(d => ({ value: d._id, label: `${d.name} ${d.surname}` }))}
+                            value={formData.doctorId ? { value: formData.doctorId, label: doctors.find(d => d._id === formData.doctorId) ? `${doctors.find(d => d._id === formData.doctorId).name} ${doctors.find(d => d._id === formData.doctorId).surname}` : formData.doctorName } : null}
+                            onChange={option => {
+                              if (option) {
+                                const doc = doctors.find(d => d._id === option.value);
+                                setFormData({ ...formData, doctorId: option.value, doctorName: doc ? `${doc.name} ${doc.surname}` : '' });
+                              } else {
+                                setFormData({ ...formData, doctorId: '', doctorName: '' });
+                              }
+                            }}
+                            styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
+                            menuPosition="fixed"
+                            isClearable
+                          />
                         </div>
                       </div>
 
@@ -1012,10 +1039,17 @@ export default function SalesPage() {
                           Insumos / Laboratorio
                         </div>
                         <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                          <select className="form-control" style={{ padding: '0.5rem', fontSize: '0.85rem' }} value={formData.discountId} onChange={handleDiscountChange}>
-                            <option value="">Sin Insumo Externo...</option>
-                            {supplies.filter(s => s.isActive !== false || s._id === formData.discountId).map(s => <option key={s._id} value={s._id}>{s.name} (${s.unitPrice?.toLocaleString('es-CL')})</option>)}
-                          </select>
+                          <Select
+                            instanceId="discount-select"
+                            placeholder="Sin Insumo Externo..."
+                            noOptionsMessage={() => "No se encontraron insumos"}
+                            options={supplies.filter(s => s.isActive !== false || s._id === formData.discountId).map(s => ({ value: s._id, label: `${s.name} ($${s.unitPrice?.toLocaleString('es-CL')})` }))}
+                            value={formData.discountId ? { value: formData.discountId, label: supplies.find(s => s._id === formData.discountId) ? `${supplies.find(s => s._id === formData.discountId).name} ($${supplies.find(s => s._id === formData.discountId).unitPrice?.toLocaleString('es-CL')})` : formData.discountName } : null}
+                            onChange={option => handleDiscountChange({ target: { value: option ? option.value : '' } })}
+                            styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1', fontSize: '0.85rem' }) }}
+                            menuPosition="fixed"
+                            isClearable
+                          />
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.25rem' }}>
                           <input type="number" className="form-control" style={{ padding: '0.5rem', fontSize: '0.85rem' }} placeholder="Cant." value={formData.discountQuantity ?? 0} onChange={e => setFormData({ ...formData, discountQuantity: Number(e.target.value) })} />
@@ -1229,7 +1263,10 @@ export default function SalesPage() {
       {showAbonoModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '500px' }}>
+            <div className="card" style={{ width: '500px' , position: 'relative'}}>
+              <button type="button" onClick={() => setShowAbonoModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
+                <X size={20} />
+              </button>
               <h2>Abonar Saldo Pendiente</h2>
               <form onSubmit={handleAbonoSubmit}>
                 <div className="form-group">
@@ -1246,12 +1283,17 @@ export default function SalesPage() {
 
                 <div className="form-group">
                   <label className="form-label">1. Seleccionar Paciente</label>
-                  <select className="form-control" value={abonoPatientId} onChange={e => setAbonoPatientId(e.target.value)} required>
-                    <option value="">Buscar paciente...</option>
-                    {patients.map(p => (
-                      <option key={p._id} value={p._id}>{p.name} {p.surname} ({p.rut})</option>
-                    ))}
-                  </select>
+                  <Select
+                    instanceId="abono-patient-select"
+                    placeholder="Buscar paciente..."
+                    noOptionsMessage={() => "No se encontraron pacientes"}
+                    options={patients.map(p => ({ value: p._id, label: `${p.name} ${p.surname} (${p.rut})` }))}
+                    value={abonoPatientId ? { value: abonoPatientId, label: patients.find(p => p._id === abonoPatientId) ? `${patients.find(p => p._id === abonoPatientId).name} ${patients.find(p => p._id === abonoPatientId).surname} (${patients.find(p => p._id === abonoPatientId).rut})` : 'Paciente' } : null}
+                    onChange={option => setAbonoPatientId(option ? option.value : '')}
+                    styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
+                    menuPosition="fixed"
+                    isClearable
+                  />
                 </div>
 
                 {abonoPatientId && (

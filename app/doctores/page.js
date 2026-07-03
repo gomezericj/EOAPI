@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Stethoscope, Phone, Mail, Award, Percent, FileCheck, Edit, Trash2, Download, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileCheck, Award, Percent, X, Stethoscope, Phone, Mail } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -27,6 +27,7 @@ export default function DoctorsPage() {
     phone: '',
     specialtyCommissions: [],
     defaultCommissionPercentage: '40',
+    referredPatientCommissionPercentage: '50',
     hasInvoice: false
   });
 
@@ -79,7 +80,7 @@ export default function DoctorsPage() {
         setFormData({
           rut: '', name: '', secondName: '', surname: '', secondSurname: '',
           age: '', email: '', phone: '', specialtyCommissions: [],
-          defaultCommissionPercentage: '40', hasInvoice: false
+          defaultCommissionPercentage: '40', referredPatientCommissionPercentage: '50', hasInvoice: false
         });
         await fetchDoctors();
         showSuccess(formData._id ? 'Doctor actualizado' : 'Doctor registrado');
@@ -130,7 +131,7 @@ export default function DoctorsPage() {
           setFormData({
             rut: '', name: '', secondName: '', surname: '', secondSurname: '',
             age: '', email: '', phone: '', specialtyCommissions: [],
-            defaultCommissionPercentage: '40', hasInvoice: false
+            defaultCommissionPercentage: '40', referredPatientCommissionPercentage: '50', hasInvoice: false
           });
           setShowModal(true);
         }}>
@@ -223,6 +224,7 @@ export default function DoctorsPage() {
                           phone: d.phone || '',
                           specialtyCommissions: d.specialtyCommissions || [],
                           defaultCommissionPercentage: d.defaultCommissionPercentage || '40',
+                          referredPatientCommissionPercentage: d.referredPatientCommissionPercentage || '50',
                           hasInvoice: d.hasInvoice || false,
                           _id: d._id
                         });
@@ -266,7 +268,14 @@ export default function DoctorsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+              <button 
+                type="button"
+                onClick={() => setShowModal(false)}
+                style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}
+              >
+                <X size={20} />
+              </button>
               <h2>{formData._id ? 'Editar Doctor' : 'Registrar Doctor'}</h2>
               <form onSubmit={handleSubmit}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -308,6 +317,11 @@ export default function DoctorsPage() {
                     <label className="form-label">Comisión por Defecto (%)</label>
                     <input type="number" className="form-control" value={formData.defaultCommissionPercentage} onChange={e => setFormData({ ...formData, defaultCommissionPercentage: e.target.value })} disabled={!isAdmin} required />
                     <small style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>Se aplicará a procedimientos que no coincidan con las especialidades abajo detalladas.</small>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label className="form-label">Comisión por Paciente Referido (%)</label>
+                    <input type="number" className="form-control" value={formData.referredPatientCommissionPercentage} onChange={e => setFormData({ ...formData, referredPatientCommissionPercentage: e.target.value })} disabled={!isAdmin} required />
+                    <small style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>Se aplicará si el doctor realiza un procedimiento a un paciente referido por él mismo (Ignora las especialidades).</small>
                   </div>
                   
                   {formData.specialtyCommissions.map((sc, idx) => (
