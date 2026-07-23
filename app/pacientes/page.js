@@ -106,11 +106,16 @@ export default function PatientsPage() {
       const url = formData._id ? `/api/patients/${formData._id}` : '/api/patients';
       const method = formData._id ? 'PUT' : 'POST';
 
+      const payload = { ...formData };
+      if (!payload.referredByDoctorId) {
+        payload.referredByDoctorId = null;
+      }
+
       showLoading(true);
       const res = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         setShowModal(false);

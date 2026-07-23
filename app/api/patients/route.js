@@ -19,6 +19,9 @@ export async function POST(req) {
   await dbConnect();
   try {
     const data = await req.json();
+    if (data.referredByDoctorId === '') {
+      data.referredByDoctorId = null;
+    }
     const patient = await Patient.create(data);
 
     // Add log

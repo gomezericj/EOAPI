@@ -11,6 +11,9 @@ export async function PUT(req, { params }) {
   const { id } = await params;
   try {
     const data = await req.json();
+    if (data.referredByDoctorId === '') {
+      data.referredByDoctorId = null;
+    }
 
     const existing = await Patient.findById(id);
     if (!existing) return NextResponse.json({ error: 'Paciente no encontrado' }, { status: 404 });
