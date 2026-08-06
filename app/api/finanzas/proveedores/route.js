@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongodb';
 import Sale from '@/models/Sale';
 import Supply from '@/models/Supply';
 import Provider from '@/models/Provider';
+import Patient from '@/models/Patient';
+import Procedure from '@/models/Procedure';
 
 export async function GET(req) {
   try {

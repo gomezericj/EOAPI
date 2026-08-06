@@ -2,6 +2,7 @@ import dbConnect from '@/lib/mongodb';
 import Sale from '@/models/Sale';
 import Doctor from '@/models/Doctor';
 import Patient from '@/models/Patient';
+import Procedure from '@/models/Procedure';
 import Setting from '@/models/Setting';
 import { NextResponse } from 'next/server';
 

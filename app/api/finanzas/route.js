@@ -2,6 +2,8 @@ import dbConnect from '@/lib/mongodb';
 import Sale from '@/models/Sale';
 import Setting from '@/models/Setting';
 import Doctor from '@/models/Doctor';
+import Patient from '@/models/Patient';
+import Procedure from '@/models/Procedure';
 import FixedExpense from '@/models/FixedExpense';
 import VariableExpense from '@/models/VariableExpense';
 import Expense from '@/models/Expense';
