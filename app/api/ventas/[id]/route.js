@@ -109,14 +109,17 @@ export async function PUT(req, { params }) {
       const patient = await Patient.findById(finalPatientId);
       let doctorCommissionPercentage = doctor?.defaultCommissionPercentage || 0;
       
+      if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions && doctor.specialtyCommissions.length > 0) {
+        const specComm = doctor.specialtyCommissions.find(sc => sc.specialty && sc.specialty.trim().toLowerCase() === procedure.specialty.trim().toLowerCase());
+        if (specComm && specComm.percentage !== undefined && specComm.percentage !== null) {
+          doctorCommissionPercentage = specComm.percentage;
+        }
+      }
+
+      // Check if it's a referred patient AND referredPatientCommissionPercentage has a valid positive value
       if (patient && patient.referredByDoctorId && doctor && patient.referredByDoctorId.toString() === doctor._id.toString()) {
-        doctorCommissionPercentage = doctor.referredPatientCommissionPercentage || 0;
-      } else {
-        if (procedure && procedure.specialty && doctor && doctor.specialtyCommissions) {
-          const specComm = doctor.specialtyCommissions.find(sc => sc.specialty === procedure.specialty);
-          if (specComm) {
-            doctorCommissionPercentage = specComm.percentage;
-          }
+        if (doctor.referredPatientCommissionPercentage !== undefined && doctor.referredPatientCommissionPercentage !== null && doctor.referredPatientCommissionPercentage > 0) {
+          doctorCommissionPercentage = doctor.referredPatientCommissionPercentage;
         }
       }
       update.doctorCommissionPercentage = doctorCommissionPercentage;

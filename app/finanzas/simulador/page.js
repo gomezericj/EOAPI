@@ -73,17 +73,18 @@ export default function RentabilidadSimuladorPage() {
     let isSpecificSpecialty = false;
 
     if (activeDoctor) {
+      currentCommissionPct = activeDoctor.defaultCommissionPercentage || 0;
+      if (p.specialty && activeDoctor.specialtyCommissions && activeDoctor.specialtyCommissions.length > 0) {
+        const specComm = activeDoctor.specialtyCommissions.find(sc => sc.specialty && sc.specialty.trim().toLowerCase() === p.specialty.trim().toLowerCase());
+        if (specComm && specComm.percentage !== undefined && specComm.percentage !== null) {
+          currentCommissionPct = specComm.percentage;
+          isSpecificSpecialty = true;
+        }
+      }
       if (isReferredPatient) {
-        currentCommissionPct = activeDoctor.referredPatientCommissionPercentage || 0;
-        isSpecificSpecialty = true; // Highlight as override
-      } else {
-        currentCommissionPct = activeDoctor.defaultCommissionPercentage || 0;
-        if (p.specialty && activeDoctor.specialtyCommissions && activeDoctor.specialtyCommissions.length > 0) {
-          const specComm = activeDoctor.specialtyCommissions.find(sc => sc.specialty === p.specialty);
-          if (specComm) {
-            currentCommissionPct = specComm.percentage;
-            isSpecificSpecialty = true;
-          }
+        if (activeDoctor.referredPatientCommissionPercentage !== undefined && activeDoctor.referredPatientCommissionPercentage !== null && activeDoctor.referredPatientCommissionPercentage > 0) {
+          currentCommissionPct = activeDoctor.referredPatientCommissionPercentage;
+          isSpecificSpecialty = true; // Highlight as override
         }
       }
     }
