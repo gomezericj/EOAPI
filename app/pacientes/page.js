@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X } from 'lucide-react';
+import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -374,14 +374,25 @@ export default function PatientsPage() {
       {showHistoryModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '900px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+            <div className="card" style={{ width: '1020px', maxWidth: '96vw', maxHeight: '92vh', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
                 <div>
-                  <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <ClipboardList size={24} color="var(--primary)" />
-                    Ficha Clínica Externa
+                  <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.4rem' }}>
+                    <ClipboardList size={26} color="var(--primary)" />
+                    Ficha Clínica y Financiera
                   </h2>
-                  {selectedPatient && <p style={{ margin: '4px 0 0', color: 'var(--text-light)', fontSize: '0.9rem' }}>Paciente: <strong>{selectedPatient.name} {selectedPatient.surname}</strong> ({selectedPatient.rut})</p>}
+                  {selectedPatient && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                      <span style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
+                        Paciente: <strong>{selectedPatient.name} {selectedPatient.surname}</strong> ({selectedPatient.rut})
+                      </span>
+                      {historyData?.externalId && (
+                        <span style={{ backgroundColor: '#e0f2fe', color: '#0369a1', fontSize: '0.75rem', fontWeight: 700, padding: '2px 8px', borderRadius: '6px' }}>
+                          ID Dentalink #{historyData.externalId}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <button 
                   onClick={() => setShowHistoryModal(false)} 
@@ -407,108 +418,268 @@ export default function PatientsPage() {
               {historyLoading ? (
                 <div style={{ padding: '4rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                   <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  <p>Consultando historial en Dentalink...</p>
+                  <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>Consultando historial clínico y financiero en Dentalink...</p>
                 </div>
-              ) : historyData?.error ? (
+              ) : historyData?.error && (!historyData?.finanzas || historyData?.finanzas?.totalGastado === 0) ? (
                 <div style={{ padding: '3rem', textAlign: 'center', backgroundColor: '#fef2f2', borderRadius: '12px', border: '1px solid #fee2e2' }}>
                   <p style={{ color: '#991b1b', fontWeight: 600, marginBottom: '0.5rem' }}>{historyData.error}</p>
                   {historyData.instructions && <p style={{ fontSize: '0.85rem', color: '#b91c1c' }}>{historyData.instructions}</p>}
                   <button onClick={() => setShowHistoryModal(false)} className="btn btn-primary" style={{ marginTop: '1.5rem' }}>Entendido</button>
                 </div>
-              ) : !historyData?.found && historyData?.message ? (
-                <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5' }}>
-                  <p style={{ color: '#9a3412', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{historyData.message}</p>
-                  {historyData.details && <p style={{ fontSize: '0.8rem', color: '#c2410c', opacity: 0.8, marginBottom: '1rem' }}>{historyData.details}</p>}
-                  <button onClick={() => setShowHistoryModal(false)} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>Cerrar</button>
+              ) : !historyData?.found && (!historyData?.finanzas || (historyData?.finanzas?.totalGastado === 0 && historyData?.finanzas?.pagos?.length === 0)) ? (
+                <div style={{ padding: '2.5rem', textAlign: 'center', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5' }}>
+                  <p style={{ color: '#9a3412', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{historyData.message || 'Paciente no hallado en el sistema externo.'}</p>
+                  {historyData?.details && <p style={{ fontSize: '0.8rem', color: '#c2410c', opacity: 0.8, marginBottom: '1.5rem' }}>{historyData.details}</p>}
+                  <button onClick={() => setShowHistoryModal(false)} className="btn btn-primary">Cerrar</button>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--primary)' }}>
-                      <Activity size={18} /> Antecedentes Médicos
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {historyData?.antecedentes?.length > 0 ? historyData.antecedentes.map((ant, idx) => (
-                        <div key={idx} style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>{ant.pregunta}</div>
-                          <div style={{ fontSize: '0.9rem', color: ant.respuesta?.toLowerCase() === 'si' ? '#ef4444' : 'var(--text)', fontWeight: ant.respuesta?.toLowerCase() === 'si' ? 600 : 400 }}>
-                            {ant.respuesta || 'N/A'} {ant.comentario && <em style={{ display: 'block', fontSize: '0.8rem', color: '#475569' }}>({ant.comentario})</em>}
-                          </div>
-                        </div>
-                      )) : (
-                        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', textAlign: 'center' }}>No hay antecedentes registrados</p>
-                      )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  {/* Banner de aviso si sólo está local */}
+                  {!historyData?.found && (
+                    <div style={{ padding: '0.75rem 1rem', backgroundColor: '#fff7ed', borderRadius: '8px', border: '1px solid #fed7aa', color: '#9a3412', fontSize: '0.85rem' }}>
+                      <strong>Nota:</strong> Paciente no encontrado en Dentalink por RUT. Mostrando información financiera y de pagos registrada en el sistema local.
+                    </div>
+                  )}
+
+                  {/* Tarjetas KPI de Resumen Financiero */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                    {/* Total Gastado / Presupuestado */}
+                    <div style={{ 
+                      backgroundColor: '#f8fafc', 
+                      border: '1px solid #e2e8f0', 
+                      borderRadius: '12px', 
+                      padding: '1.1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.3rem',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748b', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                        <span>Total Presupuestado</span>
+                        <Receipt size={18} color="#64748b" />
+                      </div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b' }}>
+                        ${(historyData.finanzas?.totalGastado || 0).toLocaleString('es-CL')}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        {historyData.finanzas?.dentalink?.totalTratamientos > 0 && historyData.finanzas?.local?.totalVentas > 0
+                          ? `Dentalink: $${historyData.finanzas.dentalink.totalTratamientos.toLocaleString('es-CL')} • Local: $${historyData.finanzas.local.totalVentas.toLocaleString('es-CL')}`
+                          : 'Tratamientos y presupuestos'}
+                      </div>
+                    </div>
+
+                    {/* Total Pagado Real */}
+                    <div style={{ 
+                      backgroundColor: '#f0fdf4', 
+                      border: '1px solid #bbf7d0', 
+                      borderRadius: '12px', 
+                      padding: '1.1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.3rem',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#166534', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                        <span>Total Pagado Real</span>
+                        <CheckCircle2 size={18} color="#16a34a" />
+                      </div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#15803d' }}>
+                        ${(historyData.finanzas?.totalPagado || 0).toLocaleString('es-CL')}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#16a34a' }}>
+                        {historyData.finanzas?.dentalink?.totalPagos > 0 && historyData.finanzas?.local?.totalPagos > 0
+                          ? `Dentalink: $${historyData.finanzas.dentalink.totalPagos.toLocaleString('es-CL')} • Local: $${historyData.finanzas.local.totalPagos.toLocaleString('es-CL')}`
+                          : 'Histórico de abonos y pagos'}
+                      </div>
+                    </div>
+
+                    {/* Saldo Pendiente */}
+                    <div style={{ 
+                      backgroundColor: (historyData.finanzas?.saldoPendiente || 0) > 0 ? '#fef2f2' : '#f0fdfa', 
+                      border: `1px solid ${(historyData.finanzas?.saldoPendiente || 0) > 0 ? '#fecaca' : '#ccfbf1'}`, 
+                      borderRadius: '12px', 
+                      padding: '1.1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.3rem',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                    }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        color: (historyData.finanzas?.saldoPendiente || 0) > 0 ? '#991b1b' : '#0f766e', 
+                        fontSize: '0.8rem', 
+                        fontWeight: 700, 
+                        textTransform: 'uppercase' 
+                      }}>
+                        <span>Saldo Pendiente</span>
+                        <AlertCircle size={18} color={(historyData.finanzas?.saldoPendiente || 0) > 0 ? '#dc2626' : '#0d9488'} />
+                      </div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: (historyData.finanzas?.saldoPendiente || 0) > 0 ? '#dc2626' : '#0f766e' }}>
+                        ${(historyData.finanzas?.saldoPendiente || 0).toLocaleString('es-CL')}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: (historyData.finanzas?.saldoPendiente || 0) > 0 ? '#ef4444' : '#0d9488' }}>
+                        {(historyData.finanzas?.saldoPendiente || 0) > 0 ? 'Deuda acumulada por saldar' : 'Al día • Sin deuda pendiente'}
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: '2rem' }}>
-                    <h3 style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-                      <ClipboardList size={18} /> Historial Clínico (Dentalink)
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      {historyData?.timeline?.length > 0 ? historyData.timeline.map((item, idx) => (
-                        <div key={idx} style={{ 
-                          padding: '1.25rem', 
-                          border: '1px solid #e2e8f0', 
-                          borderRadius: '12px', 
-                          backgroundColor: 'white',
-                          position: 'relative',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                        }}>
-                          <div style={{ 
-                            position: 'absolute', 
-                            left: '-2.4rem', 
-                            top: '1.5rem', 
-                            width: '0.75rem', 
-                            height: '0.75rem', 
-                            borderRadius: '50%', 
-                            backgroundColor: item.tipo === 'accion' ? '#3b82f6' : item.tipo === 'cita' ? '#10b981' : '#f59e0b',
-                            border: '3px solid white',
-                            boxShadow: '0 0 0 1px #e2e8f0'
-                          }} />
-                          
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e40af', fontWeight: 600, fontSize: '0.85rem' }}>
-                                {item.sede && <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Activity size={14} /> {item.sede},</span>}
-                                <span>{item.doctor}</span>
-                              </div>
-                              <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{item.fecha} {item.hora}</span>
-                            </div>
-                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f97316', textTransform: 'uppercase' }}>
-                              {item.tipo === 'accion' ? 'PRESTACIÓN REALIZADA' : item.tipo === 'cita' ? 'CITA AGENDADA' : 'EVOLUCIÓN/NOTA'}
-                            </div>
-                          </div>
+                  {/* Contenedor en 2 Columnas: Pagos a la izquierda y Timeline a la derecha */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1fr) minmax(360px, 1.25fr)', gap: '1.5rem', alignItems: 'start' }}>
+                    
+                    {/* Columna Izquierda: Historial de Pagos y Abonos */}
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid var(--border)', padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f1f5f9' }}>
+                        <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e293b' }}>
+                          <CreditCard size={20} color="var(--primary)" />
+                          Pagos y Abonos
+                        </h3>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '12px' }}>
+                          {historyData.finanzas?.pagos?.length || 0} registros
+                        </span>
+                      </div>
 
-                          <div style={{ 
-                            fontSize: '0.95rem', 
-                            lineHeight: '1.6', 
-                            color: '#334155', 
-                            fontWeight: 500,
-                            padding: '0.5rem 0',
-                            borderTop: '1px solid #f1f5f9'
-                          }}>
-                            {item.descripcion}
-                          </div>
-                          
-                          {item.detalles && (
-                            <div style={{ 
-                              marginTop: '0.5rem', 
-                              fontSize: '0.8rem', 
-                              color: '#64748b', 
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '0.35rem' }}>
+                        {historyData?.finanzas?.pagos?.length > 0 ? (
+                          historyData.finanzas.pagos.map((pago, idx) => (
+                            <div key={idx} style={{ 
+                              padding: '0.85rem 1rem', 
                               backgroundColor: '#f8fafc', 
-                              padding: '0.5rem 0.75rem', 
-                              borderRadius: '6px',
-                              border: '1px solid #f1f5f9'
+                              borderRadius: '10px', 
+                              border: '1px solid #e2e8f0',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.4rem',
+                              transition: 'all 0.15s ease'
                             }}>
-                              {item.detalles}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ 
+                                  fontSize: '0.7rem', 
+                                  fontWeight: 800, 
+                                  padding: '2px 7px', 
+                                  borderRadius: '5px', 
+                                  textTransform: 'uppercase',
+                                  backgroundColor: pago.origen === 'Dentalink' ? '#e0f2fe' : '#ede9fe',
+                                  color: pago.origen === 'Dentalink' ? '#0369a1' : '#6d28d9',
+                                  border: pago.origen === 'Dentalink' ? '1px solid #bae6fd' : '1px solid #ddd6fe'
+                                }}>
+                                  {pago.origen}
+                                </span>
+                                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>
+                                  +${Number(pago.monto || 0).toLocaleString('es-CL')}
+                                </span>
+                              </div>
+
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                                <span style={{ fontWeight: 600, color: '#334155' }}>
+                                  {pago.medio}
+                                </span>
+                                <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
+                                  {pago.fecha} {pago.hora ? `• ${pago.hora}` : ''}
+                                </span>
+                              </div>
+
+                              {(pago.referencia || pago.sucursal) && (
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', borderTop: '1px dashed #e2e8f0', paddingTop: '0.3rem', marginTop: '0.1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                  {pago.referencia && <span style={{ fontWeight: 500 }}>{pago.referencia}</span>}
+                                  {pago.sucursal && <span style={{ color: '#94a3b8' }}>{pago.sucursal}</span>}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      )) : (
-                        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem', textAlign: 'center' }}>No hay eventos en el historial</p>
-                      )}
+                          ))
+                        ) : (
+                          <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-light)', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                            <p style={{ margin: 0, fontSize: '0.85rem' }}>No hay abonos ni pagos registrados</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Columna Derecha: Historial Clínico (Dentalink) */}
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid var(--border)', padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f1f5f9' }}>
+                        <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e293b' }}>
+                          <Activity size={20} color="var(--primary)" />
+                          Historial Clínico
+                        </h3>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '12px' }}>
+                          {historyData?.timeline?.length || 0} eventos
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '0.35rem' }}>
+                        {historyData?.timeline?.length > 0 ? (
+                          historyData.timeline.map((item, idx) => (
+                            <div key={idx} style={{ 
+                              padding: '1rem 1.15rem', 
+                              border: '1px solid #e2e8f0', 
+                              borderRadius: '10px', 
+                              backgroundColor: '#ffffff',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.4rem'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.3rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                  <span style={{ 
+                                    width: '8px', 
+                                    height: '8px', 
+                                    borderRadius: '50%', 
+                                    backgroundColor: item.tipo === 'accion' ? '#3b82f6' : item.tipo === 'cita' ? '#10b981' : '#f59e0b' 
+                                  }} />
+                                  <span style={{ 
+                                    fontSize: '0.7rem', 
+                                    fontWeight: 800, 
+                                    textTransform: 'uppercase',
+                                    color: item.tipo === 'accion' ? '#2563eb' : item.tipo === 'cita' ? '#15803d' : '#d97706'
+                                  }}>
+                                    {item.tipo === 'accion' ? 'Prestación Realizada' : item.tipo === 'cita' ? 'Cita Agendada' : 'Evolución / Nota'}
+                                  </span>
+                                </div>
+                                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>
+                                  {item.fecha} {item.hora || ''}
+                                </span>
+                              </div>
+
+                              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e40af' }}>
+                                {item.doctor} {item.sede ? `• ${item.sede}` : ''}
+                              </div>
+
+                              <div style={{ 
+                                fontSize: '0.9rem', 
+                                lineHeight: '1.5', 
+                                color: '#334155', 
+                                fontWeight: 500,
+                                padding: '0.35rem 0',
+                                borderTop: '1px solid #f1f5f9'
+                              }}>
+                                {item.descripcion}
+                              </div>
+                              
+                              {item.detalles && (
+                                <div style={{ 
+                                  fontSize: '0.78rem', 
+                                  color: '#64748b', 
+                                  backgroundColor: '#f8fafc', 
+                                  padding: '0.4rem 0.6rem', 
+                                  borderRadius: '6px',
+                                  border: '1px solid #f1f5f9'
+                                }}>
+                                  {item.detalles}
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-light)', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                            <p style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos clínicos registrados en Dentalink</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               )}
@@ -516,6 +687,7 @@ export default function PatientsPage() {
           </div>
         </Portal>
       )}
+
 
       <style jsx global>{`
         @keyframes spin {

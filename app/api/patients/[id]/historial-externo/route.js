@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Patient from '@/models/Patient';
 import ApiConnection from '@/models/ApiConnection';
+import Sale from '@/models/Sale';
 
 export async function GET(req, { params }) {
   const { id } = await params;
@@ -12,6 +13,38 @@ export async function GET(req, { params }) {
     if (!patient) {
       return NextResponse.json({ error: 'Paciente no encontrado localmente' }, { status: 404 });
     }
+
+    // Obtener ventas y pagos locales del paciente
+    const localSales = await Sale.find({ patientId: patient._id }).lean();
+    let localTotalVentas = 0;
+    let localTotalPagos = 0;
+    let localSaldoPendiente = 0;
+    const localPagos = [];
+
+    (localSales || []).forEach(sale => {
+      localTotalVentas += Number(sale.totalToCollect) || 0;
+      localSaldoPendiente += Number(sale.pendingAmount) || 0;
+      
+      (sale.payments || []).forEach((pay, idx) => {
+        const payAmt = Number(pay.amount) || 0;
+        localTotalPagos += payAmt;
+        const payDate = pay.date ? new Date(pay.date) : new Date(sale.date);
+        const fechaStr = !isNaN(payDate.getTime()) ? payDate.toISOString().split('T')[0] : '';
+        const horaStr = !isNaN(payDate.getTime()) ? payDate.toTimeString().split(' ')[0].slice(0, 5) : '';
+        
+        localPagos.push({
+          id: `local-${sale._id}-${idx}`,
+          origen: 'Sistema Local',
+          monto: payAmt,
+          medio: pay.method ? (pay.method.charAt(0).toUpperCase() + pay.method.slice(1)) : 'Pago',
+          fecha: fechaStr,
+          hora: horaStr,
+          referencia: sale.procedureName ? `Prestación: ${sale.procedureName}` : (sale.doctorName ? `Dr/a: ${sale.doctorName}` : ''),
+          sucursal: 'Estética Oral',
+          timestamp: !isNaN(payDate.getTime()) ? payDate.getTime() : 0
+        });
+      });
+    });
 
     // Buscar conexión activa
     let connection = await ApiConnection.findOne({ 
@@ -26,7 +59,16 @@ export async function GET(req, { params }) {
     if (!connection) {
       return NextResponse.json({ 
         error: 'Integración no configurada o inactiva.',
-        instructions: 'Vaya a Configuración > Integraciones y active la conexión correspondiente.' 
+        instructions: 'Vaya a Configuración > Integraciones y active la conexión correspondiente.',
+        finanzas: {
+          totalGastado: localTotalVentas,
+          totalPagado: localTotalPagos,
+          saldoPendiente: localSaldoPendiente,
+          dentalink: { totalTratamientos: 0, totalPagos: 0, deuda: 0 },
+          local: { totalVentas: localTotalVentas, totalPagos: localTotalPagos, saldoPendiente: localSaldoPendiente },
+          pagos: localPagos,
+          tratamientos: []
+        }
       }, { status: 403 });
     }
 
@@ -35,18 +77,16 @@ export async function GET(req, { params }) {
     // URL Base limpia sin slash al final
     let cleanedBaseUrl = rawBaseUrl.trim().endsWith('/') ? rawBaseUrl.trim().slice(0, -1) : rawBaseUrl.trim();
     
-    // Rutas dinámicas desde configuración (Agnóstico)
+    // Rutas dinámicas desde configuración
     const endpoints = settings?.endpoints || {};
     
-    // Fallbacks inteligentes y limpieza de placeholders
     const getPath = (p, def) => {
       let path = p || def;
       if (!path.startsWith('/')) path = '/' + path;
-      return path; // No reemplazamos llaves globales para no romper JSON
+      return path;
     };
 
     const pathSearch = getPath(endpoints.search, "/api/v1/pacientes?q={\"rut\":{\"eq\":\"{rut}\"}}");
-    const pathAntecedentes = getPath(endpoints.history_antecedents, "/api/v2/pacientes/{externalId}/antecedentesmedicos");
     const pathEvoluciones = getPath(endpoints.history_evoluciones, "/api/v1/pacientes/{externalId}/evoluciones");
     const pathCitas = getPath(endpoints.history_citas, "/api/v1/pacientes/{externalId}/citas");
     const pathTratamientos = getPath(endpoints.history_tratamientos, "/api/v1/pacientes/{externalId}/tratamientos");
@@ -54,7 +94,7 @@ export async function GET(req, { params }) {
 
     const rawRut = patient.rut.trim();
     
-    // Normalización de RUTs (Esto sí es un poco específico de Chile, pero útil)
+    // Normalización de RUTs
     const normalizeRUT = (r) => {
       let clean = r.replace(/[^0-9kK]/g, '');
       if (clean.length < 2) return clean;
@@ -81,10 +121,8 @@ export async function GET(req, { params }) {
 
     // 1. Ubicar paciente externamente usando la ruta configurada
     for (const term of searchTerms) {
-      // Reemplazar el placeholder
       const relativePath = pathSearch.replace('{rut}', term).replace('{term}', term);
       
-      // Construir URL robusta con encoding de parámetros
       let finalUrl = "";
       try {
         if (relativePath.includes('?')) {
@@ -94,7 +132,6 @@ export async function GET(req, { params }) {
           
           const urlObj = new URL(cleanedBaseUrl + pathPart);
           
-          // Extraer la query y codificarla correctamente (solo el primer =)
           if (queryPart.includes('=')) {
              const firstEqual = queryPart.indexOf('=');
              const qKey = queryPart.substring(0, firstEqual);
@@ -132,24 +169,82 @@ export async function GET(req, { params }) {
       return NextResponse.json({ 
         found: false, 
         message: 'Paciente no hallado en el sistema externo.',
-        details: `RUT: ${rawRut}. Error: ${lastError || 'Sin respuesta'}`
+        details: `RUT: ${rawRut}. Error: ${lastError || 'Sin respuesta'}`,
+        finanzas: {
+          totalGastado: localTotalVentas,
+          totalPagado: localTotalPagos,
+          saldoPendiente: localSaldoPendiente,
+          dentalink: { totalTratamientos: 0, totalPagos: 0, deuda: 0 },
+          local: { totalVentas: localTotalVentas, totalPagos: localTotalPagos, saldoPendiente: localSaldoPendiente },
+          pagos: localPagos,
+          tratamientos: []
+        }
       });
     }
 
     const headers = { 'Authorization': `Token ${apiKey}`, 'Accept': 'application/json' };
 
     // 2. Fetch de datos usando rutas configuradas
-    const [anteRes, evoRes, citasRes, tratRes] = await Promise.all([
-      fetch(`${cleanedBaseUrl}${pathAntecedentes.replace('{externalId}', externalId).replace('{{externalId}}', externalId)}`, { headers }),
+    const pQuery = JSON.stringify({ id_paciente: { eq: Number(externalId) || externalId } });
+    const pagosUrl = `${cleanedBaseUrl}/v1/pagos?q=${encodeURIComponent(pQuery)}`;
+
+    const [evoRes, citasRes, tratRes, pagosRes] = await Promise.all([
       fetch(`${cleanedBaseUrl}${pathEvoluciones.replace('{externalId}', externalId).replace('{{externalId}}', externalId)}`, { headers }),
       fetch(`${cleanedBaseUrl}${pathCitas.replace('{externalId}', externalId).replace('{{externalId}}', externalId)}`, { headers }),
-      fetch(`${cleanedBaseUrl}${pathTratamientos.replace('{externalId}', externalId).replace('{{externalId}}', externalId)}`, { headers })
+      fetch(`${cleanedBaseUrl}${pathTratamientos.replace('{externalId}', externalId).replace('{{externalId}}', externalId)}`, { headers }),
+      fetch(pagosUrl, { headers })
     ]);
 
-    const anteData = anteRes.ok ? await anteRes.json() : { data: [] };
     const evoData = evoRes.ok ? await evoRes.json() : { data: [] };
     const citasData = citasRes.ok ? await citasRes.json() : { data: [] };
     const tratData = tratRes.ok ? await tratRes.json() : { data: [] };
+    const pagosData = pagosRes.ok ? await pagosRes.json() : { data: [] };
+
+    // Procesar pagos de Dentalink
+    const dentalinkPagos = (pagosData.data || []).map(p => ({
+      id: `dl-${p.id}`,
+      origen: 'Dentalink',
+      monto: Number(p.monto_pago) || 0,
+      medio: p.medio_pago || 'Pago Dentalink',
+      fecha: p.fecha_recepcion || (p.fecha_creacion ? p.fecha_creacion.split(' ')[0] : ''),
+      hora: p.fecha_creacion && p.fecha_creacion.includes(' ') ? p.fecha_creacion.split(' ')[1].slice(0, 5) : '',
+      referencia: p.numero_referencia || '',
+      sucursal: p.nombre_sucursal || '',
+      timestamp: new Date(p.fecha_creacion || p.fecha_recepcion || 0).getTime()
+    }));
+
+    // Procesar tratamientos de Dentalink
+    let dentalinkTotalTratamientos = 0;
+    let dentalinkAbonadoTratamientos = 0;
+    let dentalinkDeuda = 0;
+
+    const tratamientos = (tratData.data || []).map(t => {
+      const tot = Number(t.total) || 0;
+      const abn = Number(t.abonado) || 0;
+      const deu = Number(t.deuda) || 0;
+      dentalinkTotalTratamientos += tot;
+      dentalinkAbonadoTratamientos += abn;
+      dentalinkDeuda += deu;
+      return {
+        id: t.id,
+        nombre: t.nombre || t.nombre_tratamiento || 'Plan de Tratamiento',
+        total: tot,
+        abonado: abn,
+        deuda: deu,
+        fecha: t.fecha,
+        doctor: t.nombre_dentista || 'Profesional',
+        sucursal: t.nombre_sucursal || ''
+      };
+    });
+
+    const sumDentalinkPagos = dentalinkPagos.reduce((acc, curr) => acc + curr.monto, 0);
+    const realDentalinkPagos = Math.max(sumDentalinkPagos, dentalinkAbonadoTratamientos);
+
+    // Totales combinados
+    const totalGastado = dentalinkTotalTratamientos + localTotalVentas;
+    const totalPagado = realDentalinkPagos + localTotalPagos;
+    const saldoPendiente = Math.max(0, totalGastado - totalPagado);
+    const historialPagos = [...dentalinkPagos, ...localPagos].sort((a, b) => b.timestamp - a.timestamp);
 
     // Detalles de tratamientos (V2 opcional)
     const recentTrats = (tratData.data || []).slice(0, 10);
@@ -159,7 +254,7 @@ export async function GET(req, { params }) {
     );
     const detailsResults = await Promise.all(detailPromises);
 
-    // Consolidación de Timeline
+    // Consolidación de Timeline Clínico
     const timeline = [];
 
     (evoData.data || []).forEach(e => {
@@ -188,7 +283,7 @@ export async function GET(req, { params }) {
 
     detailsResults.forEach((dr, idx) => {
       const planId = recentTrats[idx].id;
-      const planNombre = recentTrats[idx].nombre_tratamiento || `#${planId}`;
+      const planNombre = recentTrats[idx].nombre || recentTrats[idx].nombre_tratamiento || `#${planId}`;
       (dr.data || []).filter(det => det.realizado === 1).forEach(det => {
         timeline.push({
           tipo: 'accion',
@@ -209,7 +304,23 @@ export async function GET(req, { params }) {
       found: true,
       provider: connection.provider,
       externalId,
-      antecedentes: anteData.data || [],
+      finanzas: {
+        totalGastado,
+        totalPagado,
+        saldoPendiente,
+        dentalink: {
+          totalTratamientos: dentalinkTotalTratamientos,
+          totalPagos: realDentalinkPagos,
+          deuda: dentalinkDeuda
+        },
+        local: {
+          totalVentas: localTotalVentas,
+          totalPagos: localTotalPagos,
+          saldoPendiente: localSaldoPendiente
+        },
+        pagos: historialPagos,
+        tratamientos
+      },
       timeline: timeline
     });
 
