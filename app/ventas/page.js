@@ -588,10 +588,14 @@ export default function SalesPage() {
       const refDoctor = s.patientId?.referredByDoctorId;
       const refDoctorName = refDoctor && typeof refDoctor === 'object' ? `${refDoctor.name || ''} ${refDoctor.surname || ''}`.trim() : '';
 
+      const refDocId = refDoctor?._id ? refDoctor._id.toString() : (typeof refDoctor === 'string' ? refDoctor : null);
+      const attendingDocId = s.doctorId?._id ? s.doctorId._id.toString() : (typeof s.doctorId === 'string' ? s.doctorId : null);
+      const isReferredToAttending = !!(refDocId && attendingDocId && refDocId === attendingDocId);
+
       return {
         Fecha: new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' }),
         Paciente: s.patientId ? (`${s.patientId.name} ${s.patientId.surname}${s.patientId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Paciente Eliminado (${s.patientName || 'Desconocido'})`,
-        Referido: refDoctor ? (refDoctorName ? `SÍ (Dr/a. ${refDoctorName})` : 'SÍ') : 'NO',
+        Referido: isReferredToAttending ? (refDoctorName ? `SÍ (Dr/a. ${refDoctorName})` : 'SÍ') : 'NO',
         Procedimiento: s.procedureId ? `${s.procedureId.name || s.procedureName}${s.procedureId.isActive === false ? ' (Deshabilitado)' : ''}` : `Tratamiento Eliminado (${s.procedureName || 'Desconocido'})`,
         Doctor: s.doctorId ? (`${s.doctorId.name} ${s.doctorId.surname}${s.doctorId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Doctor Eliminado (${s.doctorName || 'Desconocido'})`,
         Descuento: s.discountTotal > 0 ? (s.discountId ? `${s.discountName}${s.discountId.isActive === false ? ' (Deshabilitado)' : ''} (-$${s.discountTotal})` : `Descuento Eliminado (${s.discountName}) (-$${s.discountTotal})`) : 'Ninguno',
@@ -712,12 +716,16 @@ export default function SalesPage() {
                       const refDoctor = s.patientId?.referredByDoctorId;
                       const refDoctorName = refDoctor && typeof refDoctor === 'object' ? `${refDoctor.name || ''} ${refDoctor.surname || ''}`.trim() : '';
 
+                      const refDocId = refDoctor?._id ? refDoctor._id.toString() : (typeof refDoctor === 'string' ? refDoctor : null);
+                      const attendingDocId = s.doctorId?._id ? s.doctorId._id.toString() : (typeof s.doctorId === 'string' ? s.doctorId : null);
+                      const isReferredToAttending = !!(refDocId && attendingDocId && refDocId === attendingDocId);
+
                       if (s.patientId || s.patientId === undefined) {
                         return (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: isPatientDisabled ? 0.6 : 1, flexWrap: 'wrap' }}>
                             {isPatientDisabled && <span style={{ backgroundColor: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '1px 4px', borderRadius: '3px', textTransform: 'uppercase' }}>DESH.</span>}
                             <span>{s.patientId ? `${s.patientId.name} ${s.patientId.surname}` : s.patientName}</span>
-                            {refDoctor && (
+                            {isReferredToAttending && (
                               <span style={{
                                 backgroundColor: '#fef3c7',
                                 color: '#d97706',

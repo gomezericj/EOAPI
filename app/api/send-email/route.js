@@ -65,9 +65,11 @@ export async function POST(req) {
               const lineRet = !report.doctor.hasInvoice ? (lineComm * ((report.retentionPercentage || 13) / 100)) : 0;
               const lineLiq = lineComm - lineRet;
               
-              const isRef = s.patientId && typeof s.patientId === 'object' && s.patientId.referredByDoctorId;
-              const refDoc = isRef && typeof s.patientId.referredByDoctorId === 'object' ? s.patientId.referredByDoctorId : null;
-              const refDocName = refDoc ? `${refDoc.name || ''} ${refDoc.surname || ''}`.trim() : '';
+              const refDoc = s.patientId && typeof s.patientId === 'object' ? s.patientId.referredByDoctorId : null;
+              const refDocId = refDoc && typeof refDoc === 'object' ? refDoc._id?.toString() : (typeof refDoc === 'string' ? refDoc : null);
+              const reportDocId = doctor && doctor._id ? doctor._id.toString() : null;
+              const isRefToThisDoctor = !!(refDocId && reportDocId && refDocId === reportDocId);
+              const refDocName = refDoc && typeof refDoc === 'object' ? `${refDoc.name || ''} ${refDoc.surname || ''}`.trim() : '';
               const patientNameStr = s.patientId && typeof s.patientId === 'object' ? `${s.patientId.name || ''} ${s.patientId.surname || ''}`.trim() : 'P. no reg.';
               
               return `
@@ -75,7 +77,7 @@ export async function POST(req) {
                   <td>${new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
                   <td>
                     ${patientNameStr}
-                    ${isRef ? `<br/><span style="background-color: #fef3c7; color: #b45309; font-size: 0.65rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; border: 1px solid #f59e0b;" title="${refDocName ? `Referido por Dr(a). ${refDocName}` : 'Paciente Referido'}">REFERIDO</span>` : ''}
+                    ${isRefToThisDoctor ? `<br/><span style="background-color: #fef3c7; color: #b45309; font-size: 0.65rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; border: 1px solid #f59e0b;" title="${refDocName ? `Referido por Dr(a). ${refDocName}` : 'Paciente Referido'}">REFERIDO</span>` : ''}
                   </td>
                   <td>
                     ${s.procedureName || 'N/A'}

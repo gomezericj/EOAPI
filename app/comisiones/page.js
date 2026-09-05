@@ -160,23 +160,33 @@ export default function ComisionesPage() {
                       <tr key={`${s._id}-${idx}`}>
                         <td>{new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                            <span>{s.patientId?.name || 'Invitado'} {s.patientId?.surname || ''}</span>
-                            {s.patientId?.referredByDoctorId && (
-                              <span style={{ 
-                                backgroundColor: '#fef3c7', 
-                                color: '#d97706', 
-                                fontSize: '0.65rem', 
-                                fontWeight: 800, 
-                                padding: '1px 6px', 
-                                borderRadius: '12px',
-                                border: '1px solid #f59e0b',
-                                whiteSpace: 'nowrap'
-                              }} title={typeof s.patientId.referredByDoctorId === 'object' && s.patientId.referredByDoctorId?.name ? `Referido por Dr(a). ${s.patientId.referredByDoctorId.name} ${s.patientId.referredByDoctorId.surname || ''}` : 'Paciente Referido'}>
-                                REFERIDO
-                              </span>
-                            )}
-                          </div>
+                          {(() => {
+                            const refDoc = s.patientId?.referredByDoctorId;
+                            const refDocName = refDoc && typeof refDoc === 'object' ? `${refDoc.name || ''} ${refDoc.surname || ''}`.trim() : '';
+                            const refDocId = refDoc?._id ? refDoc._id.toString() : (typeof refDoc === 'string' ? refDoc : null);
+                            const currentDoctorId = report.doctor?._id ? report.doctor._id.toString() : (s.doctorId?._id ? s.doctorId._id.toString() : (typeof s.doctorId === 'string' ? s.doctorId : null));
+                            const isReferredToThisDoctor = !!(refDocId && currentDoctorId && refDocId === currentDoctorId);
+
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                <span>{s.patientId?.name || 'Invitado'} {s.patientId?.surname || ''}</span>
+                                {isReferredToThisDoctor && (
+                                  <span style={{ 
+                                    backgroundColor: '#fef3c7', 
+                                    color: '#d97706', 
+                                    fontSize: '0.65rem', 
+                                    fontWeight: 800, 
+                                    padding: '1px 6px', 
+                                    borderRadius: '12px',
+                                    border: '1px solid #f59e0b',
+                                    whiteSpace: 'nowrap'
+                                  }} title={refDocName ? `Referido por Dr(a). ${refDocName}` : 'Paciente Referido'}>
+                                    REFERIDO
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
