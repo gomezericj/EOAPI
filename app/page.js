@@ -9,7 +9,13 @@ import {
   ChevronRight, 
   PieChart, 
   Target, 
-  AlertCircle 
+  AlertCircle,
+  CreditCard,
+  Shield,
+  Building2,
+  HeartPulse,
+  TrendingDown,
+  Receipt
 } from 'lucide-react';
 
 import useSWR from 'swr';
@@ -109,145 +115,228 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* Tarjetas Superiores con Estilo de Cierre Diario */}
       <div className="stats-grid">
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Ventas Totales</span>
-            <div style={{ color: 'var(--success)', padding: '0.4rem', backgroundColor: '#ecfdf5', borderRadius: '8px' }}>
-              <TrendingUp size={18} />
-            </div>
+        {/* Ventas Totales */}
+        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #f59e0b', padding: '1.25rem 1rem' }}>
+          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#fef3c7', color: '#f59e0b', flexShrink: 0 }}>
+            <TrendingUp size={28} />
           </div>
-          <h2 style={{ margin: '0.25rem 0', fontSize: '1.4rem' }}>${stats.totalSales.toLocaleString('es-CL')}</h2>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Acumulado histórico</div>
+          <div>
+            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Ventas Totales</small>
+            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800 }}>${stats.totalSales.toLocaleString('es-CL')}</h3>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Acumulado del mes</div>
+          </div>
         </div>
 
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Total Recaudado Caja</span>
-            <div style={{ color: 'var(--primary)', padding: '0.4rem', backgroundColor: '#f0fdfa', borderRadius: '8px' }}>
-              <DollarSign size={18} />
-            </div>
+        {/* Total Recaudado Caja */}
+        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #3b82f6', padding: '1.25rem 1rem' }}>
+          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', flexShrink: 0 }}>
+            <DollarSign size={28} />
           </div>
-          <h2 style={{ margin: '0.25rem 0', fontSize: '1.4rem', color: 'var(--primary)' }}>${stats.chargedPayments.toLocaleString('es-CL')}</h2>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Pagos confirmados</div>
+          <div>
+            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Total Recaudado Caja</small>
+            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#1d4ed8' }}>${stats.chargedPayments.toLocaleString('es-CL')}</h3>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Pagos confirmados</div>
+          </div>
         </div>
 
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Pendiente de Cobro</span>
-            <div style={{ color: 'var(--danger)', padding: '0.4rem', backgroundColor: '#fef2f2', borderRadius: '8px' }}>
-              <AlertCircle size={18} />
-            </div>
+        {/* Pendiente de Cobro */}
+        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #ef4444', padding: '1.25rem 1rem' }}>
+          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
+            <AlertCircle size={28} />
           </div>
-          <h2 style={{ margin: '0.25rem 0', fontSize: '1.4rem', color: 'var(--danger)' }}>${stats.pendingPayments.toLocaleString('es-CL')}</h2>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Abonos pendientes</div>
+          <div>
+            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Pendiente de Cobro</small>
+            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#dc2626' }}>${stats.pendingPayments.toLocaleString('es-CL')}</h3>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Abonos pendientes</div>
+          </div>
         </div>
 
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Meta Mes</span>
-            <div style={{ color: 'var(--warning)', padding: '0.4rem', backgroundColor: '#fff7ed', borderRadius: '8px' }}>
-              <Target size={18} />
+        {/* Meta Mes */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', borderLeft: '4px solid #10b981', padding: '1.25rem 1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ padding: '0.85rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', flexShrink: 0 }}>
+              <Target size={26} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Meta Mes</small>
+              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.6rem', fontWeight: 800, color: '#15803d' }}>{metaProgress.toFixed(1)}%</h3>
             </div>
           </div>
-          <h2 style={{ margin: '0.25rem 0', fontSize: '1.4rem' }}>{metaProgress.toFixed(1)}%</h2>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', display: 'flex', justifyContent: 'space-between' }}>
-            <span>Acumulado: <strong>${stats.monthlySales.toLocaleString('es-CL')}</strong></span>
-            <span>Meta: <strong>${stats.currentMeta.toLocaleString('es-CL')}</strong></span>
-          </div>
-          <div style={{ height: '8px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginTop: '0.5rem', position: 'relative' }}>
-            {isCurrentMonth && (
-              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#93c5fd', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
-            )}
-            <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(metaProgress, 100)}%`, backgroundColor: 'var(--warning)', borderRadius: '4px', transition: 'width 1s ease-in-out', zIndex: 1 }}></div>
-          </div>
-          {isCurrentMonth && (
-            <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', textAlign: 'center', backgroundColor: '#f8fafc', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)' }}>
-              <span style={{ color: 'var(--text)' }}>
-                Proyección estimada a fin de mes:<br/> 
-                <strong style={{ fontSize: '1.1rem' }}>${Math.round(projectedSales).toLocaleString('es-CL')}</strong>
-              </span>
-              <br/>
-              {projectedSales >= stats.currentMeta ? (
-                <span style={{ color: 'var(--success)', fontWeight: 600 }}>↑ Con este ritmo se logrará la meta</span>
-              ) : (
-                <span style={{ color: 'var(--danger)', fontWeight: 600 }}>↓ Ritmo actual por debajo de la meta</span>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+              <span>Acumulado: <strong>${stats.monthlySales.toLocaleString('es-CL')}</strong></span>
+              <span>Meta: <strong>${stats.currentMeta.toLocaleString('es-CL')}</strong></span>
+            </div>
+            <div style={{ height: '8px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+              {isCurrentMonth && (
+                <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#93c5fd', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
               )}
+              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(metaProgress, 100)}%`, backgroundColor: '#10b981', borderRadius: '4px', transition: 'width 1s ease-in-out', zIndex: 1 }}></div>
             </div>
-          )}
+            {isCurrentMonth && (
+              <div style={{ marginTop: '0.6rem', fontSize: '0.72rem', textAlign: 'center', backgroundColor: '#f8fafc', padding: '0.4rem', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                <span style={{ color: 'var(--text)' }}>
+                  Proyección a fin de mes: <strong style={{ fontSize: '0.95rem' }}>${Math.round(projectedSales).toLocaleString('es-CL')}</strong>
+                </span>
+                <br/>
+                {projectedSales >= stats.currentMeta ? (
+                  <span style={{ color: 'var(--success)', fontWeight: 600 }}>↑ Con este ritmo se logrará la meta</span>
+                ) : (
+                  <span style={{ color: 'var(--danger)', fontWeight: 600 }}>↓ Ritmo actual por debajo de la meta</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
-      {/* Nuevo: Ingresos por Medio de Pago en el Dashboard */}
+      {/* Ingresos por Medio de Pago en el Dashboard con estilo de Cierre Diario */}
       <div className="card" style={{ marginTop: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <PieChart size={20} color="var(--primary)" />
           <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
             Ingresos por Medio de Pago
           </h3>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {/* Fila Superior: Medios Directos (4 columnas) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#10b981', fontSize: '0.95rem' }}>${(stats.paymentMethods.efectivo || 0).toLocaleString('es-CL')}</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem' }}>
+            {/* Efectivo */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #10b981', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#10b981', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', flexShrink: 0 }}>
+                <DollarSign size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Efectivo</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.efectivo || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>DÉBITO</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#3b82f6', fontSize: '0.95rem' }}>${(stats.paymentMethods.debito || 0).toLocaleString('es-CL')}</h4>
+
+            {/* Débito */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #3b82f6', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#3b82f6', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', flexShrink: 0 }}>
+                <CreditCard size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Débito</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.debito || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>CRÉDITO</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#6366f1', fontSize: '0.95rem' }}>${(stats.paymentMethods.credito || 0).toLocaleString('es-CL')}</h4>
+
+            {/* Crédito */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #6366f1', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#6366f1', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#eef2ff', color: '#6366f1', flexShrink: 0 }}>
+                <CreditCard size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Crédito</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.credito || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>TRANSF.</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#f59e0b', fontSize: '0.95rem' }}>${(stats.paymentMethods.transferencia || 0).toLocaleString('es-CL')}</h4>
+
+            {/* Transferencia */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #f59e0b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f59e0b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f59e0b', flexShrink: 0 }}>
+                <TrendingUp size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Transferencia</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.transferencia || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
           </div>
 
-          {/* Fila Inferior: Previsión y Coberturas (3 columnas) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#8b5cf6', fontSize: '0.95rem' }}>${(stats.paymentMethods.seguro || 0).toLocaleString('es-CL')}</h4>
+          {/* Fila Inferior: Previsión y Coberturas (3 columnas simétricas) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.85rem' }}>
+            {/* Seguro */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #8b5cf6', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#8b5cf6', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f5f3ff', color: '#8b5cf6', flexShrink: 0 }}>
+                <Shield size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Seguro</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.seguro || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#0284c7', fontSize: '0.95rem' }}>${(stats.paymentMethods.isapre || 0).toLocaleString('es-CL')}</h4>
+
+            {/* Isapre */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #0284c7', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#0284c7', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7', flexShrink: 0 }}>
+                <Building2 size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Isapre</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.isapre || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#0d9488', fontSize: '0.95rem' }}>${(stats.paymentMethods.fonasa || 0).toLocaleString('es-CL')}</h4>
+
+            {/* Fonasa */}
+            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #0d9488', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#0d9488', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0fdfa', color: '#0d9488', flexShrink: 0 }}>
+                <HeartPulse size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Fonasa</small>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.fonasa || 0).toLocaleString('es-CL')}</h3>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Nuevo: Desglose de Gastos (Egresos) en el Dashboard */}
+
+      {/* Desglose de Gastos (Egresos) en el Dashboard con estilo de Cierre Diario */}
       <div className="card" style={{ marginTop: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <AlertCircle size={20} color="#ef4444" />
           <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
             Desglose de Egresos
           </h3>
         </div>
-        <div className="responsive-grid-4">
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#991b1b', fontWeight: 600 }}>TOTAL GASTOS</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#dc2626', fontSize: '1.1rem' }}>${(stats.expenses.total || 0).toLocaleString('es-CL')}</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
+          {/* Total Gastos */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #dc2626', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2', borderTopWidth: '4px', borderTopColor: '#dc2626', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', flexShrink: 0 }}>
+              <TrendingDown size={22} />
+            </div>
+            <div>
+              <small style={{ color: '#991b1b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Total Gastos</small>
+              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.15rem', color: '#dc2626', fontWeight: 800 }}>${(stats.expenses.total || 0).toLocaleString('es-CL')}</h3>
+            </div>
           </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>VALE PERSONAL</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${(stats.expenses.valePersonal || 0).toLocaleString('es-CL')}</h4>
+
+          {/* Vale Personal */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #f97316', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f97316', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ffedd5', color: '#ea580c', flexShrink: 0 }}>
+              <Users size={20} />
+            </div>
+            <div>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Vale Personal</small>
+              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.valePersonal || 0).toLocaleString('es-CL')}</h3>
+            </div>
           </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>GASTO CLÍNICA</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${(stats.expenses.gastoClinica || 0).toLocaleString('es-CL')}</h4>
+
+          {/* Gasto Clínica */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #ef4444', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#ef4444', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
+              <Building2 size={20} />
+            </div>
+            <div>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Gasto Clínica</small>
+              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.gastoClinica || 0).toLocaleString('es-CL')}</h3>
+            </div>
           </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>OTRO</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${(stats.expenses.otro || 0).toLocaleString('es-CL')}</h4>
+
+          {/* Otro */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #64748b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#64748b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', flexShrink: 0 }}>
+              <Receipt size={20} />
+            </div>
+            <div>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Otro</small>
+              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.otro || 0).toLocaleString('es-CL')}</h3>
+            </div>
           </div>
         </div>
       </div>
