@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, DollarSign, User, Tag, Edit, Search, Download, X } from 'lucide-react';
+import { Plus, Trash2, DollarSign, User, Tag, Edit, Search, Download, X, TrendingDown, Users, Building2, Receipt, AlertCircle } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -175,26 +175,56 @@ export default function ExpensesPage() {
           </div>
         </div>
 
-        <div className="card" style={{ padding: '1.5rem' }}>
-          <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)' }}>
-            <DollarSign size={20} color="var(--danger)" /> Resumen de Egresos
-          </h3>
-          <div className="responsive-grid-4">
-            <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#991b1b', fontWeight: 600 }}>TOTAL GASTOS</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#dc2626', fontSize: '1.1rem' }}>${totalExpenses.toLocaleString('es-CL')}</h4>
+        <div className="card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            <AlertCircle size={20} color="#ef4444" />
+            <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
+              Desglose de Egresos
+            </h3>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
+            {/* Total Gastos */}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #dc2626', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2', borderTopWidth: '4px', borderTopColor: '#dc2626', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', flexShrink: 0 }}>
+                <TrendingDown size={22} />
+              </div>
+              <div>
+                <small style={{ color: '#991b1b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Total Gastos</small>
+                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.15rem', color: '#dc2626', fontWeight: 800 }}>${totalExpenses.toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>VALE PERSONAL</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${valePersonalTotal.toLocaleString('es-CL')}</h4>
+
+            {/* Vale Personal */}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #f97316', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f97316', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ffedd5', color: '#ea580c', flexShrink: 0 }}>
+                <Users size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Vale Personal</small>
+                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${valePersonalTotal.toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>GASTO CLÍNICA</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${gastoClinicaTotal.toLocaleString('es-CL')}</h4>
+
+            {/* Gasto Clínica */}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #ef4444', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#ef4444', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
+                <Building2 size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Gasto Clínica</small>
+                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${gastoClinicaTotal.toLocaleString('es-CL')}</h3>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>OTRO</p>
-              <h4 style={{ margin: '0.15rem 0 0', color: '#ef4444', fontSize: '0.95rem' }}>${otroTotal.toLocaleString('es-CL')}</h4>
+
+            {/* Otro */}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #64748b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#64748b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', flexShrink: 0 }}>
+                <Receipt size={20} />
+              </div>
+              <div>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Otro</small>
+                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${otroTotal.toLocaleString('es-CL')}</h3>
+              </div>
             </div>
           </div>
         </div>
