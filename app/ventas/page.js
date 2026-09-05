@@ -946,8 +946,8 @@ export default function SalesPage() {
                     <Plus size={24} color="var(--primary)" />
                     {formData._id ? 'Editar Venta' : 'Registrar Nueva Venta'}
                   </h2>
-                  <button type="button" onClick={() => setShowModal(false)} style={{ color: 'var(--text-light)', padding: '0.4rem', borderRadius: '50%', backgroundColor: '#f1f5f9' }}>
-                    <Trash2 size={18} />
+                  <button type="button" onClick={() => setShowModal(false)} title="Cerrar" style={{ color: 'var(--text-light)', padding: '0.4rem', borderRadius: '50%', backgroundColor: '#f1f5f9', cursor: 'pointer', border: 'none' }}>
+                    <X size={18} />
                   </button>
                 </div>
 
