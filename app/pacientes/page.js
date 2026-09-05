@@ -9,6 +9,26 @@ import useSWR, { mutate } from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import Select from 'react-select';
 
+const DentalinkIcon = ({ size = 16, color = "#0284c7" }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke={color} 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path 
+      d="M12 2C8.5 2 5.5 3.5 4.5 6.5C3.5 9.5 3.8 13.5 5 17C6 20 8 22 10 22C11.5 22 12 20 12 18C12 20 12.5 22 14 22C16 22 18 20 19 17C20.2 13.5 20.5 9.5 19.5 6.5C18.5 3.5 15.5 2 12 2Z" 
+      fill={color} 
+      fillOpacity="0.2" 
+    />
+    <path d="M9 10C10 11.5 14 11.5 15 10" />
+  </svg>
+);
+
 export default function PatientsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin';
@@ -74,7 +94,8 @@ export default function PatientsPage() {
           name: data.patient.name || '',
           surname: data.patient.surname || '',
           email: data.patient.email || '',
-          phone: data.patient.phone || ''
+          phone: data.patient.phone || '',
+          age: data.patient.age || prev.age || ''
         }));
         showSuccess('Paciente encontrado en Dentalink');
       } else if (data.error) {
@@ -289,7 +310,7 @@ export default function PatientsPage() {
               </button>
               <h2>{formData._id ? 'Editar Paciente' : 'Registrar Paciente'}</h2>
               <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 105px', gap: '1rem' }}>
                   <div className="form-group">
                     <label className="form-label">RUT / Pasaporte</label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -304,19 +325,45 @@ export default function PatientsPage() {
                       {isDentalinkActive && (
                         <button 
                           type="button" 
-                          className="btn btn-secondary" 
+                          className="btn" 
                           onClick={searchInDentalink}
                           disabled={searching || !formData.rut}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', whiteSpace: 'nowrap' }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '0.4rem', 
+                            whiteSpace: 'nowrap',
+                            backgroundColor: '#f0f9ff',
+                            color: '#0369a1',
+                            border: '1px solid #bae6fd',
+                            fontWeight: 600,
+                            fontSize: '0.82rem',
+                            padding: '0 0.85rem'
+                          }}
+                          title="Buscar información del paciente en Dentalink por RUT"
                         >
-                          {searching ? 'Cargando...' : <><Search size={16} /> Buscar</>}
+                          {searching ? (
+                            'Buscando...'
+                          ) : (
+                            <>
+                              <DentalinkIcon size={16} color="#0284c7" />
+                              <span>Buscar Dentalink</span>
+                            </>
+                          )}
                         </button>
                       )}
                     </div>
                   </div>
                   <div className="form-group">
                     <label className="form-label">Edad</label>
-                    <input type="number" className="form-control" value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} />
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      value={formData.age} 
+                      onChange={e => setFormData({ ...formData, age: e.target.value })} 
+                      placeholder="0"
+                      style={{ textAlign: 'center' }}
+                    />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

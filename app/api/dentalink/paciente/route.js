@@ -89,11 +89,24 @@ export async function GET(req) {
           const data = await response.json();
           if (data.data && data.data.length > 0) {
             const patient = data.data[0];
+            let computedAge = '';
+            if (patient.fecha_nacimiento) {
+              const birth = new Date(patient.fecha_nacimiento);
+              if (!isNaN(birth.getTime())) {
+                const now = new Date();
+                let a = now.getFullYear() - birth.getFullYear();
+                const m = now.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) a--;
+                if (a >= 0 && a < 130) computedAge = a;
+              }
+            }
+
             foundPatientData = {
               name: patient.nombre,
               surname: patient.apellidos,
               email: patient.email,
-              phone: patient.telefono || patient.celular
+              phone: patient.telefono || patient.celular,
+              age: patient.edad || computedAge || ''
             };
             break;
           }
