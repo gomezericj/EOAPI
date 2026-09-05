@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt } from 'lucide-react';
+import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt, Calendar } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -32,9 +32,11 @@ export default function PatientsPage() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyData, setHistoryData] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [timelineFilter, setTimelineFilter] = useState('todos');
 
   const fetchExternalHistory = async (patient) => {
     setSelectedPatient(patient);
+    setTimelineFilter('todos');
     setHistoryLoading(true);
     setHistoryData(null);
     setShowHistoryModal(true);
@@ -598,80 +600,244 @@ export default function PatientsPage() {
 
                     {/* Columna Derecha: Historial Clínico (Dentalink) */}
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid var(--border)', padding: '1.25rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f1f5f9' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f1f5f9', flexWrap: 'wrap', gap: '0.5rem' }}>
                         <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e293b' }}>
                           <Activity size={20} color="var(--primary)" />
-                          Historial Clínico
+                          Historial Clínico y Citas
                         </h3>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '12px' }}>
                           {historyData?.timeline?.length || 0} eventos
                         </span>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '0.35rem' }}>
-                        {historyData?.timeline?.length > 0 ? (
-                          historyData.timeline.map((item, idx) => (
-                            <div key={idx} style={{ 
-                              padding: '1rem 1.15rem', 
-                              border: '1px solid #e2e8f0', 
-                              borderRadius: '10px', 
-                              backgroundColor: '#ffffff',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '0.4rem'
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.3rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                  <span style={{ 
-                                    width: '8px', 
-                                    height: '8px', 
-                                    borderRadius: '50%', 
-                                    backgroundColor: item.tipo === 'accion' ? '#3b82f6' : item.tipo === 'cita' ? '#10b981' : '#f59e0b' 
-                                  }} />
-                                  <span style={{ 
-                                    fontSize: '0.7rem', 
-                                    fontWeight: 800, 
-                                    textTransform: 'uppercase',
-                                    color: item.tipo === 'accion' ? '#2563eb' : item.tipo === 'cita' ? '#15803d' : '#d97706'
-                                  }}>
-                                    {item.tipo === 'accion' ? 'Prestación Realizada' : item.tipo === 'cita' ? 'Cita Agendada' : 'Evolución / Nota'}
-                                  </span>
-                                </div>
-                                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>
-                                  {item.fecha} {item.hora || ''}
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e40af' }}>
-                                {item.doctor} {item.sede ? `• ${item.sede}` : ''}
-                              </div>
-
-                              <div style={{ 
-                                fontSize: '0.9rem', 
-                                lineHeight: '1.5', 
-                                color: '#334155', 
-                                fontWeight: 500,
-                                padding: '0.35rem 0',
-                                borderTop: '1px solid #f1f5f9'
+                      {/* Filtros rápidos de citas y eventos */}
+                      {historyData?.timeline?.length > 0 && (
+                        <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                          {[
+                            { key: 'todos', label: 'Todos', count: historyData.timeline.length },
+                            { key: 'atendidas', label: 'Atendidas', count: historyData.timeline.filter(i => i.tipo === 'cita' && i.estado?.atendido).length, color: '#15803d' },
+                            { key: 'no_asistio', label: 'No Asistió', count: historyData.timeline.filter(i => i.tipo === 'cita' && i.estado?.noAsistio).length, color: '#dc2626' },
+                            { key: 'anuladas', label: 'Anuladas', count: historyData.timeline.filter(i => i.tipo === 'cita' && i.estado?.anulada).length, color: '#64748b' },
+                            { key: 'notas', label: 'Evoluciones / Prestaciones', count: historyData.timeline.filter(i => i.tipo !== 'cita').length, color: '#2563eb' }
+                          ].map(f => (
+                            <button
+                              key={f.key}
+                              type="button"
+                              onClick={() => setTimelineFilter(f.key)}
+                              style={{
+                                border: '1px solid',
+                                borderColor: timelineFilter === f.key ? (f.color || 'var(--primary)') : '#e2e8f0',
+                                backgroundColor: timelineFilter === f.key ? (f.color ? `${f.color}15` : '#e0f2fe') : '#ffffff',
+                                color: timelineFilter === f.key ? (f.color || 'var(--primary)') : '#64748b',
+                                fontWeight: timelineFilter === f.key ? 700 : 500,
+                                fontSize: '0.72rem',
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                transition: 'all 0.15s ease'
+                              }}
+                            >
+                              <span>{f.label}</span>
+                              <span style={{ 
+                                backgroundColor: timelineFilter === f.key ? (f.color || 'var(--primary)') : '#f1f5f9', 
+                                color: timelineFilter === f.key ? '#ffffff' : '#475569',
+                                padding: '1px 5px', 
+                                borderRadius: '10px', 
+                                fontSize: '0.65rem',
+                                fontWeight: 700
                               }}>
-                                {item.descripcion}
-                              </div>
-                              
-                              {item.detalles && (
-                                <div style={{ 
-                                  fontSize: '0.78rem', 
-                                  color: '#64748b', 
-                                  backgroundColor: '#f8fafc', 
-                                  padding: '0.4rem 0.6rem', 
-                                  borderRadius: '6px',
-                                  border: '1px solid #f1f5f9'
+                                {f.count}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '480px', overflowY: 'auto', paddingRight: '0.35rem' }}>
+                        {historyData?.timeline?.length > 0 ? (
+                          historyData.timeline
+                            .filter(item => {
+                              if (timelineFilter === 'atendidas') return item.tipo === 'cita' && item.estado?.atendido;
+                              if (timelineFilter === 'no_asistio') return item.tipo === 'cita' && item.estado?.noAsistio;
+                              if (timelineFilter === 'anuladas') return item.tipo === 'cita' && item.estado?.anulada;
+                              if (timelineFilter === 'notas') return item.tipo !== 'cita';
+                              return true;
+                            })
+                            .map((item, idx) => {
+                              if (item.tipo === 'cita') {
+                                const isAtendido = item.estado?.atendido;
+                                const isNoAsistio = item.estado?.noAsistio;
+                                const isAnulada = item.estado?.anulada;
+
+                                const borderColor = isAtendido ? '#86efac' : isNoAsistio ? '#fca5a5' : isAnulada ? '#e2e8f0' : '#bae6fd';
+                                const badgeBg = isAtendido ? '#dcfce7' : isNoAsistio ? '#fee2e2' : isAnulada ? '#f1f5f9' : '#e0f2fe';
+                                const badgeColor = isAtendido ? '#15803d' : isNoAsistio ? '#991b1b' : isAnulada ? '#64748b' : '#0369a1';
+
+                                return (
+                                  <div key={idx} style={{ 
+                                    padding: '1rem 1.15rem', 
+                                    border: `1px solid ${borderColor}`, 
+                                    borderRadius: '10px', 
+                                    backgroundColor: isAnulada ? '#fafafa' : '#ffffff',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.6rem'
+                                  }}>
+                                    {/* Cabecera de la Cita */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                        <Calendar size={15} color={badgeColor} />
+                                        <span style={{ 
+                                          fontSize: '0.72rem', 
+                                          fontWeight: 800, 
+                                          textTransform: 'uppercase',
+                                          backgroundColor: badgeBg,
+                                          color: badgeColor,
+                                          border: `1px solid ${borderColor}`,
+                                          padding: '2px 8px',
+                                          borderRadius: '5px'
+                                        }}>
+                                          {isAtendido ? '✓ ATENDIDO / TRATAMIENTO REALIZADO' :
+                                           isNoAsistio ? '⚠ NO ASISTIÓ (INASISTENCIA SIN ANULAR)' :
+                                           isAnulada ? `✕ CITA ANULADA (${item.estado?.original || 'Anulada'})` :
+                                           `📅 CITA: ${item.estado?.titulo || 'Agendada'}`}
+                                        </span>
+                                      </div>
+                                      <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                                        {item.fecha} {item.hora ? `• ${item.hora.slice(0, 5)}` : ''} {item.horaFin ? `- ${item.horaFin.slice(0, 5)}` : ''}
+                                      </span>
+                                    </div>
+
+                                    {/* Profesional y Ubicación */}
+                                    <div style={{ fontSize: '0.82rem', color: '#1e40af', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                      <span>Dr/a: {item.doctor}</span>
+                                      {item.sede && <span style={{ color: '#64748b', fontWeight: 400 }}>• {item.sede}</span>}
+                                      {item.sillon && <span style={{ color: '#94a3b8', fontWeight: 400 }}>({item.sillon})</span>}
+                                    </div>
+
+                                    {/* Mensaje de Estado / Asistencia */}
+                                    {isAtendido && (
+                                      <div style={{ padding: '0.4rem 0.6rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '0.78rem', color: '#166534', fontWeight: 500 }}>
+                                        ✓ El paciente asistió a la cita y fue atendido por el profesional.
+                                      </div>
+                                    )}
+                                    {isNoAsistio && (
+                                      <div style={{ padding: '0.4rem 0.6rem', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '0.78rem', color: '#991b1b', fontWeight: 600 }}>
+                                        ⚠ La cita estaba reservada y NO fue cancelada, pero el paciente NO se presentó a la clínica.
+                                      </div>
+                                    )}
+                                    {isAnulada && (
+                                      <div style={{ padding: '0.4rem 0.6rem', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '0.78rem', color: '#64748b' }}>
+                                        ✕ Esta cita fue anulada o reprogramada. No hubo atención médica en esta fecha.
+                                      </div>
+                                    )}
+
+                                    {/* Detalle del Tratamiento en la Cita */}
+                                    {(item.tratamiento?.nombre || item.tratamiento?.procedimientoOMotivo || item.tratamiento?.prestacionesRealizadas?.length > 0 || item.tratamiento?.evolucionesClinicas?.length > 0) && (
+                                      <div style={{ 
+                                        backgroundColor: isAtendido ? '#f8fafc' : '#ffffff', 
+                                        border: '1px solid #e2e8f0', 
+                                        borderRadius: '8px', 
+                                        padding: '0.6rem 0.75rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.3rem',
+                                        fontSize: '0.82rem'
+                                      }}>
+                                        {item.tratamiento.nombre && (
+                                          <div style={{ color: '#334155' }}>
+                                            <strong style={{ color: '#1e293b' }}>Plan de Tratamiento:</strong> {item.tratamiento.nombre}
+                                          </div>
+                                        )}
+                                        {item.tratamiento.procedimientoOMotivo && (
+                                          <div style={{ color: '#0f766e' }}>
+                                            <strong>{isAtendido ? 'Procedimiento Realizado / Motivo:' : 'Procedimiento Programado:'}</strong> {item.tratamiento.procedimientoOMotivo}
+                                          </div>
+                                        )}
+                                        {isAtendido && item.tratamiento.prestacionesRealizadas?.length > 0 && (
+                                          <div style={{ color: '#2563eb', fontSize: '0.78rem' }}>
+                                            <strong>Prestaciones concluidas este día:</strong> {item.tratamiento.prestacionesRealizadas.join(', ')}
+                                          </div>
+                                        )}
+                                        {isAtendido && item.tratamiento.evolucionesClinicas?.length > 0 && (
+                                          <div style={{ color: '#475569', fontSize: '0.78rem', fontStyle: 'italic', borderTop: '1px dashed #e2e8f0', paddingTop: '0.3rem', marginTop: '0.1rem' }}>
+                                            <strong>Nota clínica del dentista:</strong> &ldquo;{item.tratamiento.evolucionesClinicas.join(' | ')}&rdquo;
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+
+                              // Renderizado de Prestaciones y Evoluciones
+                              return (
+                                <div key={idx} style={{ 
+                                  padding: '1rem 1.15rem', 
+                                  border: '1px solid #e2e8f0', 
+                                  borderRadius: '10px', 
+                                  backgroundColor: '#ffffff',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '0.4rem'
                                 }}>
-                                  {item.detalles}
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.3rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                      <span style={{ 
+                                        width: '8px', 
+                                        height: '8px', 
+                                        borderRadius: '50%', 
+                                        backgroundColor: item.tipo === 'accion' ? '#3b82f6' : '#f59e0b' 
+                                      }} />
+                                      <span style={{ 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: 800, 
+                                        textTransform: 'uppercase',
+                                        color: item.tipo === 'accion' ? '#2563eb' : '#d97706'
+                                      }}>
+                                        {item.tipo === 'accion' ? 'Prestación Realizada' : 'Evolución / Nota'}
+                                      </span>
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>
+                                      {item.fecha} {item.hora || ''}
+                                    </span>
+                                  </div>
+
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e40af' }}>
+                                    {item.doctor} {item.sede ? `• ${item.sede}` : ''}
+                                  </div>
+
+                                  <div style={{ 
+                                    fontSize: '0.9rem', 
+                                    lineHeight: '1.5', 
+                                    color: '#334155', 
+                                    fontWeight: 500,
+                                    padding: '0.35rem 0',
+                                    borderTop: '1px solid #f1f5f9'
+                                  }}>
+                                    {item.descripcion}
+                                  </div>
+                                  
+                                  {item.detalles && (
+                                    <div style={{ 
+                                      fontSize: '0.78rem', 
+                                      color: '#64748b', 
+                                      backgroundColor: '#f8fafc', 
+                                      padding: '0.4rem 0.6rem', 
+                                      borderRadius: '6px',
+                                      border: '1px solid #f1f5f9'
+                                    }}>
+                                      {item.detalles}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          ))
+                              );
+                            })
                         ) : (
                           <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-light)', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
                             <p style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos clínicos registrados en Dentalink</p>

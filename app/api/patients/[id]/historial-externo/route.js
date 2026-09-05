@@ -254,6 +254,31 @@ export async function GET(req, { params }) {
     );
     const detailsResults = await Promise.all(detailPromises);
 
+    // Indexación de evoluciones y prestaciones por fecha para cruzarlas con las citas
+    const evosByDate = {};
+    (evoData.data || []).forEach(e => {
+      if (e.fecha) {
+        if (!evosByDate[e.fecha]) evosByDate[e.fecha] = [];
+        const text = e.evolucion || e.comentario;
+        if (text && !evosByDate[e.fecha].includes(text)) {
+          evosByDate[e.fecha].push(text);
+        }
+      }
+    });
+
+    const prestacionesByDate = {};
+    detailsResults.forEach((dr, idx) => {
+      (dr.data || []).filter(det => det.realizado === 1).forEach(det => {
+        const dDate = det.fecha_realizacion || det.fecha_creacion;
+        if (dDate) {
+          if (!prestacionesByDate[dDate]) prestacionesByDate[dDate] = [];
+          if (det.nombre_prestacion && !prestacionesByDate[dDate].includes(det.nombre_prestacion)) {
+            prestacionesByDate[dDate].push(det.nombre_prestacion);
+          }
+        }
+      });
+    });
+
     // Consolidación de Timeline Clínico
     const timeline = [];
 
@@ -270,13 +295,75 @@ export async function GET(req, { params }) {
     });
 
     (citasData.data || []).forEach(c => {
+      const estadoCitaRaw = (c.estado_cita || '').trim();
+      const estadoLower = estadoCitaRaw.toLowerCase();
+      const idEstado = Number(c.id_estado);
+      const anulacionFlag = Number(c.estado_anulacion);
+
+      let estadoCategoria = 'programada';
+      let estadoTitulo = estadoCitaRaw || 'Agendada';
+      let atendido = false;
+      let noAsistio = false;
+      let anulada = false;
+
+      // Determinación precisa del estado de la cita
+      if (anulacionFlag === 1 || idEstado === 1 || idEstado === 9 || idEstado === 10 || idEstado === 14 || estadoLower.includes('anulad') || estadoLower.includes('cambio de fecha')) {
+        anulada = true;
+        estadoCategoria = 'anulada';
+        estadoTitulo = estadoCitaRaw ? `Cita Anulada (${estadoCitaRaw})` : 'Cita Anulada';
+      } else if (idEstado === 8 || estadoLower.includes('no asiste')) {
+        noAsistio = true;
+        estadoCategoria = 'no_asistio';
+        estadoTitulo = 'No Asistió (Inasistencia sin anular)';
+      } else if (idEstado === 2 || estadoLower === 'atendido') {
+        atendido = true;
+        estadoCategoria = 'atendido';
+        estadoTitulo = 'Atendido (Tratamiento realizado)';
+      } else if (idEstado === 6 || estadoLower.includes('atendiéndose')) {
+        atendido = true;
+        estadoCategoria = 'atendiendose';
+        estadoTitulo = 'En Atención Actual';
+      } else if (idEstado === 5 || estadoLower.includes('espera')) {
+        estadoCategoria = 'sala_espera';
+        estadoTitulo = 'En Sala de Espera';
+      } else if (idEstado === 3 || idEstado === 11 || estadoLower.includes('confirmad')) {
+        estadoCategoria = 'confirmada';
+        estadoTitulo = `Confirmada (${estadoCitaRaw})`;
+      } else {
+        estadoCategoria = 'programada';
+        estadoTitulo = estadoCitaRaw || 'Agendada';
+      }
+
+      // Prestaciones y evoluciones vinculadas a la fecha de esta cita
+      const prestacionesRealizadas = prestacionesByDate[c.fecha] || [];
+      const evolucionesClinicas = evosByDate[c.fecha] || [];
+
       timeline.push({
         tipo: 'cita',
+        id: c.id,
         fecha: c.fecha,
         hora: c.hora_inicio || '',
-        doctor: c.nombre_dentista || 'Clínica',
-        descripcion: `CITA AGENDADA: ${c.nombre_estado || 'Programada'}`,
-        detalles: `Sucursal: ${c.nombre_sucursal || 'Principal'}`,
+        horaFin: c.hora_fin || '',
+        doctor: c.nombre_dentista || 'Profesional Dentalink',
+        sede: c.nombre_sucursal || '',
+        sillon: c.nombre_sillon || '',
+        estado: {
+          categoria: estadoCategoria, // 'atendido', 'no_asistio', 'anulada', 'confirmada', 'sala_espera', 'programada'
+          titulo: estadoTitulo,
+          atendido,
+          noAsistio,
+          anulada,
+          original: estadoCitaRaw
+        },
+        tratamiento: {
+          id: c.id_tratamiento || null,
+          nombre: c.nombre_tratamiento && c.tratamiento_sin_asignar !== 1 ? c.nombre_tratamiento : null,
+          procedimientoOMotivo: c.comentarios || null,
+          prestacionesRealizadas,
+          evolucionesClinicas
+        },
+        descripcion: `CITA: ${estadoTitulo}`,
+        detalles: c.comentarios ? `Motivo/Procedimiento: ${c.comentarios}` : null,
         timestamp: new Date(c.fecha + (c.hora_inicio ? ` ${c.hora_inicio}` : '')).getTime()
       });
     });
