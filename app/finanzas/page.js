@@ -261,34 +261,41 @@ export default function FinanzasPage() {
             <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PieIcon size={20} color="var(--primary)" /> Ingresos por Medio de Pago
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#10b981' }}>{formatCurrency(data.summary.paymentMethods?.efectivo || 0)}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {/* Fila Superior: Medios Directos (4 columnas) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#10b981' }}>{formatCurrency(data.summary.paymentMethods?.efectivo || 0)}</h4>
+                </div>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>DÉBITO</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#3b82f6' }}>{formatCurrency(data.summary.paymentMethods?.debito || 0)}</h4>
+                </div>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>CRÉDITO</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#6366f1' }}>{formatCurrency(data.summary.paymentMethods?.credito || 0)}</h4>
+                </div>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>TRANSFERENCIA</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#f59e0b' }}>{formatCurrency(data.summary.paymentMethods?.transferencia || 0)}</h4>
+                </div>
               </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>DÉBITO</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#3b82f6' }}>{formatCurrency(data.summary.paymentMethods?.debito || 0)}</h4>
-              </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>CRÉDITO</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#6366f1' }}>{formatCurrency(data.summary.paymentMethods?.credito || 0)}</h4>
-              </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>TRANSFERENCIA</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#f59e0b' }}>{formatCurrency(data.summary.paymentMethods?.transferencia || 0)}</h4>
-              </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#8b5cf6' }}>{formatCurrency(data.summary.paymentMethods?.seguro || 0)}</h4>
-              </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#0284c7' }}>{formatCurrency(data.summary.paymentMethods?.isapre || 0)}</h4>
-              </div>
-              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
-                <h4 style={{ margin: '0.5rem 0 0', color: '#0d9488' }}>{formatCurrency(data.summary.paymentMethods?.fonasa || 0)}</h4>
+
+              {/* Fila Inferior: Previsión y Coberturas (3 columnas) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#8b5cf6' }}>{formatCurrency(data.summary.paymentMethods?.seguro || 0)}</h4>
+                </div>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#0284c7' }}>{formatCurrency(data.summary.paymentMethods?.isapre || 0)}</h4>
+                </div>
+                <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
+                  <h4 style={{ margin: '0.5rem 0 0', color: '#0d9488' }}>{formatCurrency(data.summary.paymentMethods?.fonasa || 0)}</h4>
+                </div>
               </div>
             </div>
           </div>

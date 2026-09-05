@@ -186,34 +186,41 @@ export default function Dashboard() {
             Ingresos por Medio de Pago
           </h3>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#10b981', fontSize: '0.95rem' }}>${(stats.paymentMethods.efectivo || 0).toLocaleString('es-CL')}</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {/* Fila Superior: Medios Directos (4 columnas) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#10b981', fontSize: '0.95rem' }}>${(stats.paymentMethods.efectivo || 0).toLocaleString('es-CL')}</h4>
+            </div>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>DÉBITO</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#3b82f6', fontSize: '0.95rem' }}>${(stats.paymentMethods.debito || 0).toLocaleString('es-CL')}</h4>
+            </div>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>CRÉDITO</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#6366f1', fontSize: '0.95rem' }}>${(stats.paymentMethods.credito || 0).toLocaleString('es-CL')}</h4>
+            </div>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>TRANSF.</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#f59e0b', fontSize: '0.95rem' }}>${(stats.paymentMethods.transferencia || 0).toLocaleString('es-CL')}</h4>
+            </div>
           </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>DÉBITO</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#3b82f6', fontSize: '0.95rem' }}>${(stats.paymentMethods.debito || 0).toLocaleString('es-CL')}</h4>
-          </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>CRÉDITO</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#6366f1', fontSize: '0.95rem' }}>${(stats.paymentMethods.credito || 0).toLocaleString('es-CL')}</h4>
-          </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>TRANSF.</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#f59e0b', fontSize: '0.95rem' }}>${(stats.paymentMethods.transferencia || 0).toLocaleString('es-CL')}</h4>
-          </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#8b5cf6', fontSize: '0.95rem' }}>${(stats.paymentMethods.seguro || 0).toLocaleString('es-CL')}</h4>
-          </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#0284c7', fontSize: '0.95rem' }}>${(stats.paymentMethods.isapre || 0).toLocaleString('es-CL')}</h4>
-          </div>
-          <div style={{ textAlign: 'center', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
-            <h4 style={{ margin: '0.15rem 0 0', color: '#0d9488', fontSize: '0.95rem' }}>${(stats.paymentMethods.fonasa || 0).toLocaleString('es-CL')}</h4>
+
+          {/* Fila Inferior: Previsión y Coberturas (3 columnas) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#8b5cf6', fontSize: '0.95rem' }}>${(stats.paymentMethods.seguro || 0).toLocaleString('es-CL')}</h4>
+            </div>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#0284c7', fontSize: '0.95rem' }}>${(stats.paymentMethods.isapre || 0).toLocaleString('es-CL')}</h4>
+            </div>
+            <div style={{ textAlign: 'center', padding: '0.6rem 0.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
+              <h4 style={{ margin: '0.15rem 0 0', color: '#0d9488', fontSize: '0.95rem' }}>${(stats.paymentMethods.fonasa || 0).toLocaleString('es-CL')}</h4>
+            </div>
           </div>
         </div>
       </div>
