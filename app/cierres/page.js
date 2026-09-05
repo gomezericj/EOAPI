@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Mail, Calendar, DollarSign, Users, CreditCard, Shield, TrendingDown, TrendingUp, CheckCircle2, Trash2 } from 'lucide-react';
+import { Mail, Calendar, DollarSign, Users, CreditCard, Shield, TrendingDown, TrendingUp, CheckCircle2, Trash2, Building2, HeartPulse } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
@@ -124,12 +124,12 @@ export default function CierresPage() {
               <div style={{ padding: '1rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6' }}><DollarSign size={28} /></div>
               <div>
                 <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.9rem' }}>Total Recaudado (Caja Fuerte)</small>
-                <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.8rem' }}>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0)).toLocaleString('es-CL')}</h3>
+                <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.8rem' }}>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0)).toLocaleString('es-CL')}</h3>
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '2rem' }}>
             <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #10b981', padding: '1rem 0.75rem' }}>
               <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981' }}><DollarSign size={20} /></div>
               <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Efectivo</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.cashTotal || 0).toLocaleString('es-CL')}</h3></div>
@@ -145,6 +145,14 @@ export default function CierresPage() {
             <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #8b5cf6', padding: '1rem 0.75rem' }}>
               <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f5f3ff', color: '#8b5cf6' }}><Shield size={20} /></div>
               <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Seguros</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.insuranceTotal || 0).toLocaleString('es-CL')}</h3></div>
+            </div>
+            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #0284c7', padding: '1rem 0.75rem' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7' }}><Building2 size={20} /></div>
+              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Isapre</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.isapreTotal || 0).toLocaleString('es-CL')}</h3></div>
+            </div>
+            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #0d9488', padding: '1rem 0.75rem' }}>
+              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0fdfa', color: '#0d9488' }}><HeartPulse size={20} /></div>
+              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Fonasa</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.fonasaTotal || 0).toLocaleString('es-CL')}</h3></div>
             </div>
             <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #ef4444', padding: '1rem 0.75rem' }}>
               <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444' }}><Users size={20} /></div>
@@ -186,11 +194,13 @@ export default function CierresPage() {
                     <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.9rem' }}><span>Crédito</span><strong>${(report.todayTotals?.credit || 0).toLocaleString('es-CL')}</strong></li>
                     <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.9rem' }}><span>Seguro</span><strong>${(report.todayTotals?.insurance || 0).toLocaleString('es-CL')}</strong></li>
                     <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.9rem' }}><span>Transferencia</span><strong>${(report.todayTotals?.transfer || 0).toLocaleString('es-CL')}</strong></li>
+                    <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.9rem' }}><span>Isapre</span><strong>${(report.todayTotals?.isapre || 0).toLocaleString('es-CL')}</strong></li>
+                    <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.9rem' }}><span>Fonasa</span><strong>${(report.todayTotals?.fonasa || 0).toLocaleString('es-CL')}</strong></li>
                   </div>
 
                   <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderTop: '1px solid var(--border)' }}>
                     <span style={{ fontWeight: 600 }}>Subtotal Cobrado</span>
-                    <strong style={{ fontSize: '1.1rem' }}>${((report.todayTotals?.cash || 0) + (report.todayTotals?.debit || 0) + (report.todayTotals?.credit || 0) + (report.todayTotals?.insurance || 0) + (report.todayTotals?.transfer || 0)).toLocaleString('es-CL')}</strong>
+                    <strong style={{ fontSize: '1.1rem' }}>${((report.todayTotals?.cash || 0) + (report.todayTotals?.debit || 0) + (report.todayTotals?.credit || 0) + (report.todayTotals?.insurance || 0) + (report.todayTotals?.transfer || 0) + (report.todayTotals?.isapre || 0) + (report.todayTotals?.fonasa || 0)).toLocaleString('es-CL')}</strong>
                   </li>
 
 
@@ -223,9 +233,11 @@ export default function CierresPage() {
                   <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}><span>Crédito</span><strong>${(report.pastTotals?.credit || 0).toLocaleString('es-CL')}</strong></li>
                   <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}><span>Seguro</span><strong>${(report.pastTotals?.insurance || 0).toLocaleString('es-CL')}</strong></li>
                   <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}><span>Transferencia</span><strong>${(report.pastTotals?.transfer || 0).toLocaleString('es-CL')}</strong></li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}><span>Isapre</span><strong>${(report.pastTotals?.isapre || 0).toLocaleString('es-CL')}</strong></li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}><span>Fonasa</span><strong>${(report.pastTotals?.fonasa || 0).toLocaleString('es-CL')}</strong></li>
                   <li style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#ecfdf5', borderRadius: '4px', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #a7f3d0' }}>
                     <span style={{ fontWeight: 700, color: 'var(--success)' }}>Total Recaudado Abonos</span>
-                    <strong style={{ fontSize: '1.1rem', color: 'var(--success)' }}>${((report.pastTotals?.cash || 0) + (report.pastTotals?.debit || 0) + (report.pastTotals?.credit || 0) + (report.pastTotals?.insurance || 0) + (report.pastTotals?.transfer || 0)).toLocaleString('es-CL')}</strong>
+                    <strong style={{ fontSize: '1.1rem', color: 'var(--success)' }}>${((report.pastTotals?.cash || 0) + (report.pastTotals?.debit || 0) + (report.pastTotals?.credit || 0) + (report.pastTotals?.insurance || 0) + (report.pastTotals?.transfer || 0) + (report.pastTotals?.isapre || 0) + (report.pastTotals?.fonasa || 0)).toLocaleString('es-CL')}</strong>
                   </li>
                 </ul>
               </div>
@@ -233,7 +245,7 @@ export default function CierresPage() {
               <div style={{ marginTop: 'auto', borderTop: '2px solid var(--border)', paddingTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Total General Recaudado</span>
-                  <strong style={{ fontSize: '1.5rem' }}>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0)).toLocaleString('es-CL')}</strong>
+                  <strong style={{ fontSize: '1.5rem' }}>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0)).toLocaleString('es-CL')}</strong>
                 </div>
               </div>
             </div>
@@ -245,7 +257,7 @@ export default function CierresPage() {
                   <span>Pacientes Atendidos con Venta</span><strong>{report.totalPatients || 0}</strong>
                 </li>
                 <li style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderBottom: '1px solid var(--border)' }}>
-                  <span>Total Dinero Recaudado (+)</span><strong>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0)).toLocaleString('es-CL')}</strong>
+                  <span>Total Dinero Recaudado (+)</span><strong>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0)).toLocaleString('es-CL')}</strong>
                 </li>
                 <li style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderBottom: '1px solid var(--border)', color: 'var(--danger)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -262,9 +274,17 @@ export default function CierresPage() {
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Shield size={18} /> Seguros (No ingresa en el día) (-)</span>
                   <strong style={{ color: 'var(--danger)' }}>-${(report.insuranceTotal || 0).toLocaleString('es-CL')}</strong>
                 </li>
+                <li style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderBottom: '1px solid var(--border)', color: 'var(--warning)' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Building2 size={18} /> Isapre (No ingresa en el día) (-)</span>
+                  <strong style={{ color: 'var(--danger)' }}>-${(report.isapreTotal || 0).toLocaleString('es-CL')}</strong>
+                </li>
+                <li style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderBottom: '1px solid var(--border)', color: 'var(--warning)' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><HeartPulse size={18} /> Fonasa (No ingresa en el día) (-)</span>
+                  <strong style={{ color: 'var(--danger)' }}>-${(report.fonasaTotal || 0).toLocaleString('es-CL')}</strong>
+                </li>
                 <li style={{ display: 'flex', justifyContent: 'space-between', padding: '1.5rem 0', fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>
                   <span>Subtotal Neto</span>
-                  <strong>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.transferTotal || 0) - (report.expensesTotal || 0)).toLocaleString('es-CL')}</strong>
+                  <strong>${(report.netSubtotal || 0).toLocaleString('es-CL')}</strong>
                 </li>
               </ul>
 

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const PaymentSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
-  method: { type: String, enum: ['credito', 'debito', 'efectivo', 'seguro', 'transferencia'], required: true },
+  method: { type: String, enum: ['credito', 'debito', 'efectivo', 'seguro', 'transferencia', 'isapre', 'fonasa'], required: true },
   amount: { type: Number, required: true },
 });
 

@@ -37,8 +37,10 @@ export async function GET(req, { params }) {
       credito: 0,
       seguro: 0,
       transferencia: 0,
-      todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
-      pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
+      isapre: 0,
+      fonasa: 0,
+      todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
+      pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
       pending: 0,
       patients: new Set(),
       clinicalSalesSum: 0,
@@ -81,6 +83,8 @@ export async function GET(req, { params }) {
             else if (method === 'credito') { totals.credito += amount; targetObj.credito += amount; }
             else if (method === 'seguro') { totals.seguro += amount; targetObj.seguro += amount; }
             else if (method === 'transferencia') { totals.transferencia += amount; targetObj.transferencia += amount; }
+            else if (method === 'isapre') { totals.isapre += amount; targetObj.isapre += amount; }
+            else if (method === 'fonasa') { totals.fonasa += amount; targetObj.fonasa += amount; }
           }
         });
       }
@@ -101,9 +105,9 @@ export async function GET(req, { params }) {
     });
     
     // Default sums if no saved closure
-    const todaySum = (totals.todayTotals.efectivo || 0) + (totals.todayTotals.debito || 0) + (totals.todayTotals.credito || 0) + (totals.todayTotals.seguro || 0) + (totals.todayTotals.transferencia || 0);
-    const pastSum = (totals.pastTotals.efectivo || 0) + (totals.pastTotals.debito || 0) + (totals.pastTotals.credito || 0) + (totals.pastTotals.seguro || 0) + (totals.pastTotals.transferencia || 0);
-    const genSum = (totals.efectivo || 0) + (totals.debito || 0) + (totals.credito || 0) + (totals.seguro || 0) + (totals.transferencia || 0);
+    const todaySum = (totals.todayTotals.efectivo || 0) + (totals.todayTotals.debito || 0) + (totals.todayTotals.credito || 0) + (totals.todayTotals.seguro || 0) + (totals.todayTotals.transferencia || 0) + (totals.todayTotals.isapre || 0) + (totals.todayTotals.fonasa || 0);
+    const pastSum = (totals.pastTotals.efectivo || 0) + (totals.pastTotals.debito || 0) + (totals.pastTotals.credito || 0) + (totals.pastTotals.seguro || 0) + (totals.pastTotals.transferencia || 0) + (totals.pastTotals.isapre || 0) + (totals.pastTotals.fonasa || 0);
+    const genSum = (totals.efectivo || 0) + (totals.debito || 0) + (totals.credito || 0) + (totals.seguro || 0) + (totals.transferencia || 0) + (totals.isapre || 0) + (totals.fonasa || 0);
     
     // Check if there's a saved closure
     const existingClosure = await Closure.findOne({ date: start }).lean();
@@ -116,12 +120,16 @@ export async function GET(req, { params }) {
       creditTotal: existingClosure.creditTotal || 0,
       insuranceTotal: existingClosure.insuranceTotal || 0,
       transferTotal: existingClosure.transferTotal || 0,
+      isapreTotal: existingClosure.isapreTotal || 0,
+      fonasaTotal: existingClosure.fonasaTotal || 0,
       todayTotals: {
         cash: existingClosure.todayTotals?.cash || 0,
         debit: existingClosure.todayTotals?.debit || 0,
         credit: existingClosure.todayTotals?.credit || 0,
         insurance: existingClosure.todayTotals?.insurance || 0,
         transfer: existingClosure.todayTotals?.transfer || 0,
+        isapre: existingClosure.todayTotals?.isapre || 0,
+        fonasa: existingClosure.todayTotals?.fonasa || 0,
       },
       pastTotals: {
         cash: existingClosure.pastTotals?.cash || 0,
@@ -129,6 +137,8 @@ export async function GET(req, { params }) {
         credit: existingClosure.pastTotals?.credit || 0,
         insurance: existingClosure.pastTotals?.insurance || 0,
         transfer: existingClosure.pastTotals?.transfer || 0,
+        isapre: existingClosure.pastTotals?.isapre || 0,
+        fonasa: existingClosure.pastTotals?.fonasa || 0,
       },
       pendingTotal: existingClosure.pendingTotal || 0,
       totalPatients: existingClosure.totalPatients || 0,
@@ -149,12 +159,16 @@ export async function GET(req, { params }) {
       creditTotal: totals.credito || 0,
       insuranceTotal: totals.seguro || 0,
       transferTotal: totals.transferencia || 0,
+      isapreTotal: totals.isapre || 0,
+      fonasaTotal: totals.fonasa || 0,
       todayTotals: {
         cash: totals.todayTotals.efectivo || 0,
         debit: totals.todayTotals.debito || 0,
         credit: totals.todayTotals.credito || 0,
         insurance: totals.todayTotals.seguro || 0,
         transfer: totals.todayTotals.transferencia || 0,
+        isapre: totals.todayTotals.isapre || 0,
+        fonasa: totals.todayTotals.fonasa || 0,
       },
       pastTotals: {
         cash: totals.pastTotals.efectivo || 0,
@@ -162,6 +176,8 @@ export async function GET(req, { params }) {
         credit: totals.pastTotals.credito || 0,
         insurance: totals.pastTotals.seguro || 0,
         transfer: totals.pastTotals.transferencia || 0,
+        isapre: totals.pastTotals.isapre || 0,
+        fonasa: totals.pastTotals.fonasa || 0,
       },
       pendingTotal: totals.pending || 0,
       totalPatients: totals.patients.size || 0,

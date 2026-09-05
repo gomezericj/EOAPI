@@ -103,7 +103,7 @@ const RUN_DB = async () => {
 
   // 7. Sales for Jan and Feb 2026
   console.log("Agregando +300 Tratamientos/Ventas para estresar Febrero y Enero con data mixta...");
-  const methods = ['efectivo', 'debito', 'credito', 'seguro', 'transferencia'];
+  const methods = ['efectivo', 'debito', 'credito', 'seguro', 'transferencia', 'isapre', 'fonasa'];
   
   const randEl = arr => arr[Math.floor(Math.random() * arr.length)];
   const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -204,9 +204,9 @@ const RUN_DB = async () => {
       });
 
       let totals = {
-        efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0,
-        todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
-        pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
+        efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0,
+        todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
+        pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
         pending: 0, patients: new Set()
       };
 
@@ -232,6 +232,8 @@ const RUN_DB = async () => {
               else if (method === 'credito') { totals.credito += amount; targetObj.credito += amount; }
               else if (method === 'seguro') { totals.seguro += amount; targetObj.seguro += amount; }
               else if (method === 'transferencia') { totals.transferencia += amount; targetObj.transferencia += amount; }
+              else if (method === 'isapre') { totals.isapre += amount; targetObj.isapre += amount; }
+              else if (method === 'fonasa') { totals.fonasa += amount; targetObj.fonasa += amount; }
             }
           });
         }
@@ -240,9 +242,9 @@ const RUN_DB = async () => {
       const expenses = await Expense.find({ date: { $gte: start, $lte: end } });
       const expensesTotal = expenses.reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
 
-      const todaySum = totals.todayTotals.efectivo + totals.todayTotals.debito + totals.todayTotals.credito + totals.todayTotals.seguro + totals.todayTotals.transferencia;
-      const pastSum = totals.pastTotals.efectivo + totals.pastTotals.debito + totals.pastTotals.credito + totals.pastTotals.seguro + totals.pastTotals.transferencia;
-      const genSum = totals.efectivo + totals.debito + totals.credito + totals.seguro + totals.transferencia;
+      const todaySum = totals.todayTotals.efectivo + totals.todayTotals.debito + totals.todayTotals.credito + totals.todayTotals.seguro + totals.todayTotals.transferencia + totals.todayTotals.isapre + totals.todayTotals.fonasa;
+      const pastSum = totals.pastTotals.efectivo + totals.pastTotals.debito + totals.pastTotals.credito + totals.pastTotals.seguro + totals.pastTotals.transferencia + totals.pastTotals.isapre + totals.pastTotals.fonasa;
+      const genSum = totals.efectivo + totals.debito + totals.credito + totals.seguro + totals.transferencia + totals.isapre + totals.fonasa;
 
       await Closure.create({
         date: start,
@@ -250,8 +252,11 @@ const RUN_DB = async () => {
         debitTotal: totals.debito || 0,
         creditTotal: totals.credito || 0,
         insuranceTotal: totals.seguro || 0,
-        todayTotals: { cash: totals.todayTotals.efectivo, debit: totals.todayTotals.debito, credit: totals.todayTotals.credito, insurance: totals.todayTotals.seguro },
-        pastTotals: { cash: totals.pastTotals.efectivo, debit: totals.pastTotals.debito, credit: totals.pastTotals.credito, insurance: totals.pastTotals.seguro },
+        transferTotal: totals.transferencia || 0,
+        isapreTotal: totals.isapre || 0,
+        fonasaTotal: totals.fonasa || 0,
+        todayTotals: { cash: totals.todayTotals.efectivo, debit: totals.todayTotals.debito, credit: totals.todayTotals.credito, insurance: totals.todayTotals.seguro, transfer: totals.todayTotals.transferencia, isapre: totals.todayTotals.isapre, fonasa: totals.todayTotals.fonasa },
+        pastTotals: { cash: totals.pastTotals.efectivo, debit: totals.pastTotals.debito, credit: totals.pastTotals.credito, insurance: totals.pastTotals.seguro, transfer: totals.pastTotals.transferencia, isapre: totals.pastTotals.isapre, fonasa: totals.pastTotals.fonasa },
         pendingTotal: totals.pending || 0,
         totalPatients: totals.patients.size || 0,
         expensesTotal: expensesTotal || 0,

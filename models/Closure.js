@@ -7,6 +7,8 @@ const ClosureSchema = new mongoose.Schema({
   creditTotal: { type: Number, default: 0 },
   insuranceTotal: { type: Number, default: 0 },
   transferTotal: { type: Number, default: 0 },
+  isapreTotal: { type: Number, default: 0 },
+  fonasaTotal: { type: Number, default: 0 },
   
   todayTotals: {
     cash: { type: Number, default: 0 },
@@ -14,6 +16,8 @@ const ClosureSchema = new mongoose.Schema({
     credit: { type: Number, default: 0 },
     insurance: { type: Number, default: 0 },
     transfer: { type: Number, default: 0 },
+    isapre: { type: Number, default: 0 },
+    fonasa: { type: Number, default: 0 },
   },
   pastTotals: {
     cash: { type: Number, default: 0 },
@@ -21,6 +25,8 @@ const ClosureSchema = new mongoose.Schema({
     credit: { type: Number, default: 0 },
     insurance: { type: Number, default: 0 },
     transfer: { type: Number, default: 0 },
+    isapre: { type: Number, default: 0 },
+    fonasa: { type: Number, default: 0 },
   },
 
   pendingTotal: { type: Number, default: 0 },

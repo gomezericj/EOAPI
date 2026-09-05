@@ -86,7 +86,7 @@ export async function GET(req) {
     let totalAdmin = 0;
     let totalInstalaciones = 0;
     let totalComisiones = 0;
-    const paymentMethods = { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 };
+    const paymentMethods = { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 };
     
     const procStats = {};
     const docStats = {};

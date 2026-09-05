@@ -261,7 +261,7 @@ export default function FinanzasPage() {
             <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PieIcon size={20} color="var(--primary)" /> Ingresos por Medio de Pago
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
               <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>EFECTIVO</p>
                 <h4 style={{ margin: '0.5rem 0 0', color: '#10b981' }}>{formatCurrency(data.summary.paymentMethods?.efectivo || 0)}</h4>
@@ -281,6 +281,14 @@ export default function FinanzasPage() {
               <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>SEGURO</p>
                 <h4 style={{ margin: '0.5rem 0 0', color: '#8b5cf6' }}>{formatCurrency(data.summary.paymentMethods?.seguro || 0)}</h4>
+              </div>
+              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>ISAPRE</p>
+                <h4 style={{ margin: '0.5rem 0 0', color: '#0284c7' }}>{formatCurrency(data.summary.paymentMethods?.isapre || 0)}</h4>
+              </div>
+              <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>FONASA</p>
+                <h4 style={{ margin: '0.5rem 0 0', color: '#0d9488' }}>{formatCurrency(data.summary.paymentMethods?.fonasa || 0)}</h4>
               </div>
             </div>
           </div>

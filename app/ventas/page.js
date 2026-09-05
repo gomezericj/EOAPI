@@ -1099,8 +1099,10 @@ export default function SalesPage() {
                               <option value="efectivo">Efectivo 💵</option>
                               <option value="debito">Débito 💳</option>
                               <option value="credito">Crédito 💳</option>
-                              <option value="seguro">Seguro ☂️</option>
                               <option value="transferencia">Transf. 🏦</option>
+                              <option value="seguro">Seguro ☂️</option>
+                              <option value="isapre">Isapre 🏥</option>
+                              <option value="fonasa">Fonasa 🩺</option>
                             </select>
                             <input type="number" className="form-control" style={{ padding: '0.4rem', fontSize: '0.8rem' }} placeholder="Monto" value={currentPayment.amount} onChange={e => setCurrentPayment({ ...currentPayment, amount: Number(e.target.value) })} />
                             <button type="button" className="btn btn-primary" onClick={addPayment} style={{ backgroundColor: '#16a34a', border: 'none', padding: '0 0.5rem' }}><Plus size={16} /></button>
@@ -1115,7 +1117,10 @@ export default function SalesPage() {
                                 {p.method === 'efectivo' ? '💵 Efectivo' : 
                                  p.method === 'debito' ? '💳 Débito' : 
                                  p.method === 'credito' ? '💳 Crédito' : 
-                                 p.method === 'seguro' ? '☂️ Seguro' : '🏦 Transf.'}
+                                 p.method === 'transferencia' ? '🏦 Transf.' :
+                                 p.method === 'seguro' ? '☂️ Seguro' :
+                                 p.method === 'isapre' ? '🏥 Isapre' :
+                                 p.method === 'fonasa' ? '🩺 Fonasa' : p.method}
                               </span>
                               <span>${Number(p.amount).toLocaleString('es-CL')} <Trash2 size={12} style={{ color: '#ef4444', marginLeft: '0.25rem', cursor: 'pointer' }} onClick={() => removePayment(i)} /></span>
                             </div>
@@ -1217,6 +1222,8 @@ export default function SalesPage() {
                                   {(p.payments || []).map((pay, idx) => {
                                     const emoji = pay.method === 'efectivo' ? '💵' : 
                                                   pay.method === 'seguro' ? '☂️' : 
+                                                  pay.method === 'isapre' ? '🏥' :
+                                                  pay.method === 'fonasa' ? '🩺' :
                                                   pay.method === 'transferencia' ? '🏦' : '💳';
                                     return (
                                       <span key={idx} style={{ fontSize: '0.6rem', backgroundColor: '#ecfdf5', color: '#065f46', padding: '2px 4px', borderRadius: '3px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
@@ -1353,8 +1360,10 @@ export default function SalesPage() {
                         <option value="efectivo">Efectivo</option>
                         <option value="debito">Débito</option>
                         <option value="credito">Crédito</option>
-                        <option value="seguro">Seguro</option>
                         <option value="transferencia">Transferencia</option>
+                        <option value="seguro">Seguro</option>
+                        <option value="isapre">Isapre</option>
+                        <option value="fonasa">Fonasa</option>
                       </select>
                     </div>
 

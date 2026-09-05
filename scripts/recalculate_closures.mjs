@@ -29,9 +29,9 @@ async function recalculate() {
             });
 
             let totals = {
-                efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0,
-                todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
-                pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0 },
+                efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0,
+                todayTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
+                pastTotals: { efectivo: 0, debito: 0, credito: 0, seguro: 0, transferencia: 0, isapre: 0, fonasa: 0 },
                 pending: 0,
                 patients: new Set(),
                 clinicalSalesSum: 0,
@@ -72,6 +72,8 @@ async function recalculate() {
                             else if (method === 'credito') { totals.credito += amount; targetObj.credito += amount; }
                             else if (method === 'seguro') { totals.seguro += amount; targetObj.seguro += amount; }
                             else if (method === 'transferencia') { totals.transferencia += amount; targetObj.transferencia += amount; }
+                            else if (method === 'isapre') { totals.isapre += amount; targetObj.isapre += amount; }
+                            else if (method === 'fonasa') { totals.fonasa += amount; targetObj.fonasa += amount; }
                         }
                     });
                 }
@@ -80,8 +82,8 @@ async function recalculate() {
             const expenses = await Expense.find({ date: { $gte: start, $lte: end } });
             const expensesTotal = expenses.reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
             
-            const genSum = totals.efectivo + totals.debito + totals.credito + totals.seguro + totals.transferencia;
-            const pastSum = totals.pastTotals.efectivo + totals.pastTotals.debito + totals.pastTotals.credito + totals.pastTotals.seguro + totals.pastTotals.transferencia;
+            const genSum = totals.efectivo + totals.debito + totals.credito + totals.seguro + totals.transferencia + totals.isapre + totals.fonasa;
+            const pastSum = totals.pastTotals.efectivo + totals.pastTotals.debito + totals.pastTotals.credito + totals.pastTotals.seguro + totals.pastTotals.transferencia + totals.pastTotals.isapre + totals.pastTotals.fonasa;
 
             // Mapping to model fields
             closure.cashTotal = totals.efectivo;
@@ -89,13 +91,17 @@ async function recalculate() {
             closure.creditTotal = totals.credito;
             closure.insuranceTotal = totals.seguro;
             closure.transferTotal = totals.transferencia;
+            closure.isapreTotal = totals.isapre;
+            closure.fonasaTotal = totals.fonasa;
             
             closure.todayTotals = {
                 cash: totals.todayTotals.efectivo,
                 debit: totals.todayTotals.debito,
                 credit: totals.todayTotals.credito,
                 insurance: totals.todayTotals.seguro,
-                transfer: totals.todayTotals.transferencia
+                transfer: totals.todayTotals.transferencia,
+                isapre: totals.todayTotals.isapre,
+                fonasa: totals.todayTotals.fonasa
             };
             
             closure.pastTotals = {
@@ -103,7 +109,9 @@ async function recalculate() {
                 debit: totals.pastTotals.debito,
                 credit: totals.pastTotals.credito,
                 insurance: totals.pastTotals.seguro,
-                transfer: totals.pastTotals.transferencia
+                transfer: totals.pastTotals.transferencia,
+                isapre: totals.pastTotals.isapre,
+                fonasa: totals.pastTotals.fonasa
             };
 
             closure.pendingTotal = totals.pending;

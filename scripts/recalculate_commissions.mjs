@@ -1,12 +1,19 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
+import dns from 'dns';
 import { fileURLToPath } from 'url';
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignore DNS override error if restricted
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read .env manually
+// Read .env manually if variable not already set
 const envPath = path.join(__dirname, '../.env');
 if (fs.existsSync(envPath)) {
   const envConfig = fs.readFileSync(envPath, 'utf8');
@@ -16,7 +23,7 @@ if (fs.existsSync(envPath)) {
       const parts = trimmed.split('=');
       const key = parts[0].trim();
       const val = parts.slice(1).join('=').trim().replace(/^["']|["']$/g, '');
-      if (key && val) process.env[key] = val;
+      if (key && val && !process.env[key]) process.env[key] = val;
     }
   });
 }

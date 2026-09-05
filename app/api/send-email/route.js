@@ -143,6 +143,8 @@ export async function POST(req) {
                 <li><strong>Crédito:</strong> $${(report.todayTotals?.credit || 0).toLocaleString('es-CL')}</li>
                 <li><strong>Transferencia:</strong> $${(report.todayTotals?.transfer || 0).toLocaleString('es-CL')}</li>
                 <li><strong>Seguro:</strong> $${(report.todayTotals?.insurance || 0).toLocaleString('es-CL')}</li>
+                <li><strong>Isapre:</strong> $${(report.todayTotals?.isapre || 0).toLocaleString('es-CL')}</li>
+                <li><strong>Fonasa:</strong> $${(report.todayTotals?.fonasa || 0).toLocaleString('es-CL')}</li>
                 <li style="color: #ef4444;"><strong>Pendiente por Cobrar:</strong> $${(report.pendingTotal || 0).toLocaleString('es-CL')}</li>
               </ul>
             </div>
@@ -155,6 +157,8 @@ export async function POST(req) {
                 <li><strong>Crédito:</strong> $${(report.pastTotals?.credit || 0).toLocaleString('es-CL')}</li>
                 <li><strong>Transferencia:</strong> $${(report.pastTotals?.transfer || 0).toLocaleString('es-CL')}</li>
                 <li><strong>Seguro:</strong> $${(report.pastTotals?.insurance || 0).toLocaleString('es-CL')}</li>
+                <li><strong>Isapre:</strong> $${(report.pastTotals?.isapre || 0).toLocaleString('es-CL')}</li>
+                <li><strong>Fonasa:</strong> $${(report.pastTotals?.fonasa || 0).toLocaleString('es-CL')}</li>
                 <li style="border-top: 1px dashed #e2e8f0; margin-top: 5px; padding-top: 5px; color: #10b981; font-weight: bold;"><strong>Total Abonos (Caja extra):</strong> $${(report.pastDebtCollected || 0).toLocaleString('es-CL')}</li>
               </ul>
             </div>
@@ -177,6 +181,14 @@ export async function POST(req) {
                 <tr style="color: #f59e0b;">
                   <td>Pagos por Seguro retenidos (-) :</td>
                   <td align="right"><strong>-$${(report.insuranceTotal || 0).toLocaleString('es-CL')}</strong></td>
+                </tr>
+                <tr style="color: #0284c7;">
+                  <td>Pagos por Isapre retenidos (-) :</td>
+                  <td align="right"><strong>-$${(report.isapreTotal || 0).toLocaleString('es-CL')}</strong></td>
+                </tr>
+                <tr style="color: #0d9488;">
+                  <td>Pagos por Fonasa retenidos (-) :</td>
+                  <td align="right"><strong>-$${(report.fonasaTotal || 0).toLocaleString('es-CL')}</strong></td>
                 </tr>
                 <tr>
                   <td colspan="2"><hr style="border: 0; border-top: 2px solid #025158; margin: 10px 0;" /></td>
