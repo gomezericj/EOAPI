@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt, Calendar } from 'lucide-react';
+import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt, Calendar, Loader2 } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -322,36 +322,31 @@ export default function PatientsPage() {
                         required 
                         style={{ marginBottom: 0 }}
                       />
-                      {isDentalinkActive && (
-                        <button 
-                          type="button" 
-                          className="btn" 
-                          onClick={searchInDentalink}
-                          disabled={searching || !formData.rut}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '0.4rem', 
-                            whiteSpace: 'nowrap',
-                            backgroundColor: '#f0f9ff',
-                            color: '#0369a1',
-                            border: '1px solid #bae6fd',
-                            fontWeight: 600,
-                            fontSize: '0.82rem',
-                            padding: '0 0.85rem'
-                          }}
-                          title="Buscar información del paciente en Dentalink por RUT"
-                        >
-                          {searching ? (
-                            'Buscando...'
-                          ) : (
-                            <>
-                              <DentalinkIcon size={16} color="#0284c7" />
-                              <span>Buscar Dentalink</span>
-                            </>
-                          )}
-                        </button>
-                      )}
+                      {isDentalinkActive && (() => {
+                        const isRutEmpty = !formData.rut || formData.rut.trim() === '';
+                        const isSearchDisabled = searching || isRutEmpty;
+                        return (
+                          <button 
+                            type="button" 
+                            className="btn btn-dentalink-search" 
+                            onClick={searchInDentalink}
+                            disabled={isSearchDisabled}
+                            title={isRutEmpty ? "Ingrese un RUT para buscar en Dentalink" : "Buscar información del paciente en Dentalink por RUT"}
+                          >
+                            {searching ? (
+                              <>
+                                <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                                <span>Buscando...</span>
+                              </>
+                            ) : (
+                              <>
+                                <DentalinkIcon size={16} color={isSearchDisabled ? "#94a3b8" : "#ffffff"} />
+                                <span>Buscar Dentalink</span>
+                              </>
+                            )}
+                          </button>
+                        );
+                      })()}
                     </div>
                   </div>
                   <div className="form-group">
@@ -903,6 +898,38 @@ export default function PatientsPage() {
 
 
       <style jsx global>{`
+        .btn-dentalink-search {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          white-space: nowrap;
+          font-weight: 600;
+          font-size: 0.84rem;
+          padding: 0 0.95rem;
+          border-radius: var(--radius);
+          transition: all 0.2s ease-in-out;
+        }
+        .btn-dentalink-search:not(:disabled) {
+          background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+          color: #ffffff;
+          border: 1px solid #0284c7;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+        }
+        .btn-dentalink-search:not(:disabled):hover {
+          background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(2, 132, 199, 0.35);
+        }
+        .btn-dentalink-search:disabled {
+          background-color: #f1f5f9 !important;
+          color: #94a3b8 !important;
+          border: 1px solid #e2e8f0 !important;
+          cursor: not-allowed !important;
+          opacity: 0.65;
+          box-shadow: none !important;
+          transform: none !important;
+        }
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
