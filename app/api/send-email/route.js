@@ -65,10 +65,18 @@ export async function POST(req) {
               const lineRet = !report.doctor.hasInvoice ? (lineComm * ((report.retentionPercentage || 13) / 100)) : 0;
               const lineLiq = lineComm - lineRet;
               
+              const isRef = s.patientId && typeof s.patientId === 'object' && s.patientId.referredByDoctorId;
+              const refDoc = isRef && typeof s.patientId.referredByDoctorId === 'object' ? s.patientId.referredByDoctorId : null;
+              const refDocName = refDoc ? `${refDoc.name || ''} ${refDoc.surname || ''}`.trim() : '';
+              const patientNameStr = s.patientId && typeof s.patientId === 'object' ? `${s.patientId.name || ''} ${s.patientId.surname || ''}`.trim() : 'P. no reg.';
+              
               return `
                 <tr>
                   <td>${new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
-                  <td>${s.patientId && typeof s.patientId === 'object' ? `${s.patientId.name || ''} ${s.patientId.surname || ''}` : 'P. no reg.'}</td>
+                  <td>
+                    ${patientNameStr}
+                    ${isRef ? `<br/><span style="background-color: #fef3c7; color: #b45309; font-size: 0.65rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; border: 1px solid #f59e0b;" title="${refDocName ? `Referido por Dr(a). ${refDocName}` : 'Paciente Referido'}">REFERIDO</span>` : ''}
+                  </td>
                   <td>
                     ${s.procedureName || 'N/A'}
                     ${s.commissionReleaseDate ? '<br/><span style="background-color: #dcfce7; color: #15803d; font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; font-weight: bold; border: 1px solid #15803d;">LIBERADA</span>' : ''}

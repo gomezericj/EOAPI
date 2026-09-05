@@ -36,7 +36,11 @@ export async function GET(req) {
 
     const sales = await Sale.find(query)
       .populate('doctorId', 'name surname isActive')
-      .populate('patientId', 'name surname rut isActive')
+      .populate({
+        path: 'patientId',
+        select: 'name surname rut isActive referredByDoctorId',
+        populate: { path: 'referredByDoctorId', select: 'name surname' }
+      })
       .populate('procedureId', 'name isActive')
       .populate('discountId', 'name isActive')
       .sort({ date: -1 });

@@ -584,18 +584,24 @@ export default function SalesPage() {
   });
 
   const exportToExcel = () => {
-    const data = filteredSales.map(s => ({
-      Fecha: new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' }),
-      Paciente: s.patientId ? (`${s.patientId.name} ${s.patientId.surname}${s.patientId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Paciente Eliminado (${s.patientName || 'Desconocido'})`,
-      Procedimiento: s.procedureId ? `${s.procedureId.name || s.procedureName}${s.procedureId.isActive === false ? ' (Deshabilitado)' : ''}` : `Tratamiento Eliminado (${s.procedureName || 'Desconocido'})`,
-      Doctor: s.doctorId ? (`${s.doctorId.name} ${s.doctorId.surname}${s.doctorId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Doctor Eliminado (${s.doctorName || 'Desconocido'})`,
-      Descuento: s.discountTotal > 0 ? (s.discountId ? `${s.discountName}${s.discountId.isActive === false ? ' (Deshabilitado)' : ''} (-$${s.discountTotal})` : `Descuento Eliminado (${s.discountName}) (-$${s.discountTotal})`) : 'Ninguno',
-      Total_A_Cobrar: s.totalToCollect,
-      Pagado: s.totalCharged,
-      Pendiente: s.pendingAmount,
-      Estado_Pago: s.status === 'pagada' ? 'PAGADA' : 'PENDIENTE',
-      Liberada_el: s.commissionReleaseDate ? new Date(s.commissionReleaseDate).toLocaleDateString('es-CL', { timeZone: 'UTC' }) : (s.isTreatmentInProgress ? `EN CURSO (${(s.commissionReleasedTotal || 0)} de ${(s.totalToCollect || 0) - (s.discountTotal || 0)})` : 'NO')
-    }));
+    const data = filteredSales.map(s => {
+      const refDoctor = s.patientId?.referredByDoctorId;
+      const refDoctorName = refDoctor && typeof refDoctor === 'object' ? `${refDoctor.name || ''} ${refDoctor.surname || ''}`.trim() : '';
+
+      return {
+        Fecha: new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' }),
+        Paciente: s.patientId ? (`${s.patientId.name} ${s.patientId.surname}${s.patientId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Paciente Eliminado (${s.patientName || 'Desconocido'})`,
+        Referido: refDoctor ? (refDoctorName ? `SÍ (Dr/a. ${refDoctorName})` : 'SÍ') : 'NO',
+        Procedimiento: s.procedureId ? `${s.procedureId.name || s.procedureName}${s.procedureId.isActive === false ? ' (Deshabilitado)' : ''}` : `Tratamiento Eliminado (${s.procedureName || 'Desconocido'})`,
+        Doctor: s.doctorId ? (`${s.doctorId.name} ${s.doctorId.surname}${s.doctorId.isActive === false ? ' (Deshabilitado)' : ''}`).trim() : `Doctor Eliminado (${s.doctorName || 'Desconocido'})`,
+        Descuento: s.discountTotal > 0 ? (s.discountId ? `${s.discountName}${s.discountId.isActive === false ? ' (Deshabilitado)' : ''} (-$${s.discountTotal})` : `Descuento Eliminado (${s.discountName}) (-$${s.discountTotal})`) : 'Ninguno',
+        Total_A_Cobrar: s.totalToCollect,
+        Pagado: s.totalCharged,
+        Pendiente: s.pendingAmount,
+        Estado_Pago: s.status === 'pagada' ? 'PAGADA' : 'PENDIENTE',
+        Liberada_el: s.commissionReleaseDate ? new Date(s.commissionReleaseDate).toLocaleDateString('es-CL', { timeZone: 'UTC' }) : (s.isTreatmentInProgress ? `EN CURSO (${(s.commissionReleasedTotal || 0)} de ${(s.totalToCollect || 0) - (s.discountTotal || 0)})` : 'NO')
+      };
+    });
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas");
@@ -703,11 +709,28 @@ export default function SalesPage() {
                   <td>
                     {(() => {
                       const isPatientDisabled = s.patientId?.isActive === false || (s.patientId === undefined && patients.find(p => `${p.name} ${p.surname}` === s.patientName)?.isActive === false);
+                      const refDoctor = s.patientId?.referredByDoctorId;
+                      const refDoctorName = refDoctor && typeof refDoctor === 'object' ? `${refDoctor.name || ''} ${refDoctor.surname || ''}`.trim() : '';
+
                       if (s.patientId || s.patientId === undefined) {
                         return (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: isPatientDisabled ? 0.6 : 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: isPatientDisabled ? 0.6 : 1, flexWrap: 'wrap' }}>
                             {isPatientDisabled && <span style={{ backgroundColor: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '1px 4px', borderRadius: '3px', textTransform: 'uppercase' }}>DESH.</span>}
-                            {s.patientId ? `${s.patientId.name} ${s.patientId.surname}` : s.patientName}
+                            <span>{s.patientId ? `${s.patientId.name} ${s.patientId.surname}` : s.patientName}</span>
+                            {refDoctor && (
+                              <span style={{
+                                backgroundColor: '#fef3c7',
+                                color: '#d97706',
+                                fontSize: '0.65rem',
+                                fontWeight: 800,
+                                padding: '1px 6px',
+                                borderRadius: '12px',
+                                border: '1px solid #f59e0b',
+                                whiteSpace: 'nowrap'
+                              }} title={refDoctorName ? `Referido por Dr(a). ${refDoctorName}` : 'Paciente Referido'}>
+                                REFERIDO
+                              </span>
+                            )}
                           </div>
                         );
                       }

@@ -51,7 +51,11 @@ export async function GET(req, { params }) {
           'commissionReleases.date': { $gte: start, $lte: end }
         }
       ]
-    }).populate('patientId', 'name surname').populate('procedureId', 'name');
+    }).populate({
+      path: 'patientId',
+      select: 'name surname referredByDoctorId',
+      populate: { path: 'referredByDoctorId', select: 'name surname' }
+    }).populate('procedureId', 'name');
 
     const reportSales = [];
     let totalFacturado = 0;

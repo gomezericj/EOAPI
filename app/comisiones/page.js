@@ -159,7 +159,25 @@ export default function ComisionesPage() {
                     return (
                       <tr key={`${s._id}-${idx}`}>
                         <td>{new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
-                        <td>{s.patientId?.name || 'Invitado'} {s.patientId?.surname || ''}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                            <span>{s.patientId?.name || 'Invitado'} {s.patientId?.surname || ''}</span>
+                            {s.patientId?.referredByDoctorId && (
+                              <span style={{ 
+                                backgroundColor: '#fef3c7', 
+                                color: '#d97706', 
+                                fontSize: '0.65rem', 
+                                fontWeight: 800, 
+                                padding: '1px 6px', 
+                                borderRadius: '12px',
+                                border: '1px solid #f59e0b',
+                                whiteSpace: 'nowrap'
+                              }} title={typeof s.patientId.referredByDoctorId === 'object' && s.patientId.referredByDoctorId?.name ? `Referido por Dr(a). ${s.patientId.referredByDoctorId.name} ${s.patientId.referredByDoctorId.surname || ''}` : 'Paciente Referido'}>
+                                REFERIDO
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             {s.procedureId?.name || s.procedureName}
