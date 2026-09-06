@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Star, Trash2, Edit, ToggleLeft, ToggleRight, X } from 'lucide-react';
+import { Plus, Search, Star, Trash2, Edit, ToggleLeft, ToggleRight, X, Award } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
@@ -145,26 +145,65 @@ export default function SpecialtiesPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '400px' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar Especialidad' : 'Registrar Especialidad'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Nombre de Especialidad</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    placeholder="Ej: Ortodoncia"
-                  />
+            <div className="card" style={{ width: '480px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Award size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Especialidad' : 'Registrar Especialidad'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Categorías odontológicas para clasificar procedimientos y tarifas de doctores.
+                    </p>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar</button>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                      Nombre de la Especialidad
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      placeholder="Ej: Ortodoncia, Endodoncia, Periodoncia..."
+                      style={{ marginBottom: 0 }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>Guardar</button>
                 </div>
               </form>
             </div>

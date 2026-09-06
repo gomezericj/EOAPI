@@ -292,34 +292,56 @@ export default function IntegrationsPage() {
       {showGallery && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '600px', padding: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ margin: 0 }}>Catálogo de Integraciones</h2>
-                <button className="btn-icon" onClick={() => setShowGallery(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} color="#64748b" /></button>
+            <div className="card" style={{ width: '640px', padding: '1.75rem', position: 'relative', borderRadius: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>Catálogo de Integraciones</h2>
+                  <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', margin: '2px 0 0 0' }}>Selecciona el servicio que deseas sincronizar con la clínica.</p>
+                </div>
+                <button 
+                  onClick={() => setShowGallery(false)} 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
               </div>
-              <p style={{ color: '#64748b', marginBottom: '2rem' }}>Selecciona el servicio que deseas conectar con tu clínica.</p>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 {/* Dentalink */}
                 <div 
                   onClick={() => { setShowGallery(false); fillDentalinkDefaults(); }}
-                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s' }}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: '#ffffff' }}
                   className="hover-card"
                 >
-                  <Database size={32} color="#0284c7" />
-                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>Dentalink</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Sincronización de pacientes, evoluciones y agendas médicas.</p>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#f0fdfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Database size={24} color="#0d9488" />
+                  </div>
+                  <h3 style={{ margin: '0.25rem 0 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>Dentalink</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', margin: 0, lineHeight: 1.4 }}>Sincronización de pacientes, evoluciones y agendas médicas.</p>
                 </div>
 
                 {/* n8n */}
                 <div 
                   onClick={() => { setShowGallery(false); fillN8nDefaults(); }}
-                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s' }}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: '#ffffff' }}
                   className="hover-card"
                 >
-                  <Workflow size={32} color="#ea580c" />
-                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>n8n Webhooks</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Automatizaciones cuando se registran ventas u otros eventos.</p>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Workflow size={24} color="#ea580c" />
+                  </div>
+                  <h3 style={{ margin: '0.25rem 0 0 0', fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>n8n Webhooks</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', margin: 0, lineHeight: 1.4 }}>Automatizaciones cuando se registran ventas u otros eventos.</p>
                 </div>
 
                 {/* Personalizada */}
@@ -330,12 +352,18 @@ export default function IntegrationsPage() {
                     setSettingsJson('{}');
                     setShowModal(true); 
                   }}
-                  style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s', gridColumn: '1 / -1', backgroundColor: '#f1f5f9' }}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1', backgroundColor: '#f8fafc' }}
                   className="hover-card"
                 >
-                  <Blocks size={32} color="#475569" />
-                  <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}>Integración Personalizada</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', margin: 0 }}>Conecta cualquier otra API configurando los parámetros desde cero.</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Blocks size={22} color="#475569" />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>Integración Personalizada</h3>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', margin: 0 }}>Conecta cualquier otra API externa configurando los parámetros desde cero.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -346,53 +374,87 @@ export default function IntegrationsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Settings color="var(--primary)" />
-                {formData._id ? 'Editar Integración' : 'Nueva Integración'}
-              </h2>
+            <div className="card" style={{ width: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Settings size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Integración' : 'Nueva Integración'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Parámetros de conexión, autenticación y mapeo técnico.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Proveedor / Nombre Descriptivo</label>
-                    <input type="text" className="form-control" value={formData.provider} onChange={e => setFormData({...formData, provider: e.target.value})} required placeholder="Ej. Dentalink, Hubspot..." />
-                  </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">System Key (Driver Id)</label>
-                    <input type="text" className="form-control" value={formData.systemKey} onChange={e => setFormData({...formData, systemKey: e.target.value.toUpperCase().replace(/\s+/g, '_')})} required placeholder="DENTALINK_PACIENTES" disabled={!!formData._id} />
-                  </div>
-                </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1rem' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Entorno</label>
-                    <select className="form-control" value={formData.environment} onChange={e => setFormData({...formData, environment: e.target.value})}>
-                      <option value="PROD">Producción (PROD)</option>
-                      <option value="TEST">Pruebas (TEST)</option>
-                    </select>
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Proveedor / Nombre</label>
+                      <input type="text" className="form-control" value={formData.provider} onChange={e => setFormData({...formData, provider: e.target.value})} required placeholder="Ej. Dentalink, Hubspot..." style={{ marginBottom: 0 }} />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>System Key (Driver Id)</label>
+                      <input type="text" className="form-control" value={formData.systemKey} onChange={e => setFormData({...formData, systemKey: e.target.value.toUpperCase().replace(/\s+/g, '_')})} required placeholder="DENTALINK_PACIENTES" disabled={!!formData._id} style={{ marginBottom: 0 }} />
+                    </div>
                   </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Entorno</label>
+                      <select className="form-control" value={formData.environment} onChange={e => setFormData({...formData, environment: e.target.value})} style={{ marginBottom: 0 }}>
+                        <option value="PROD">Producción (PROD)</option>
+                        <option value="TEST">Pruebas (TEST)</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Base URL (API Endpoint)</label>
+                      <input type="url" className="form-control" value={formData.baseUrl} onChange={e => setFormData({...formData, baseUrl: e.target.value})} required placeholder="https://api..." style={{ marginBottom: 0 }} />
+                    </div>
+                  </div>
+
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Base URL (API Endpoint)</label>
-                    <input type="url" className="form-control" value={formData.baseUrl} onChange={e => setFormData({...formData, baseUrl: e.target.value})} required placeholder="https://api..." />
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>API Key / Authorization Token</label>
+                    <input type="password" className="form-control" value={formData.apiKey} onChange={e => setFormData({...formData, apiKey: e.target.value})} placeholder="Ingrese el token de acceso" style={{ marginBottom: 0 }} />
                   </div>
                 </div>
 
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">API Key / Authorization Token</label>
-                  <input type="password" className="form-control" value={formData.apiKey} onChange={e => setFormData({...formData, apiKey: e.target.value})} placeholder="Ingrese el token de acceso" />
-                </div>
-
-                <div style={{ backgroundColor: '#fdf2f2', padding: '1rem', borderRadius: '8px', border: '1px solid #fecaca', marginBottom: '0.5rem' }}>
-                  <h4 style={{ margin: '0 0 0.75rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#991b1b', fontSize: '0.9rem' }}>
-                    <Code size={16} /> Configuración Avanzada (JSON Mapping)
-                  </h4>
+                <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>
+                    <Code size={16} color="var(--primary)" />
+                    <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e293b' }}>Configuración Avanzada (JSON Mapping)</span>
+                  </div>
                   <div style={{ position: 'relative' }}>
                     <textarea 
                       className="form-control" 
-                      style={{ height: '300px', fontFamily: 'monospace', fontSize: '0.8rem', backgroundColor: '#1e293b', color: '#e2e8f0', lineHeight: '1.5', padding: '1rem' }}
+                      style={{ height: '220px', fontFamily: 'monospace', fontSize: '0.8rem', backgroundColor: '#0f172a', color: '#e2e8f0', lineHeight: '1.5', padding: '0.85rem', borderRadius: '10px' }}
                       value={settingsJson}
                       onChange={e => setSettingsJson(e.target.value)}
                     />
@@ -402,13 +464,17 @@ export default function IntegrationsPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginRight: 'auto' }}>
-                      <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} />
-                      Activo
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>
+                      <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }} />
+                      Activo para sincronización
                    </label>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary"><Save size={18} style={{marginRight: '0.5rem'}}/>Guardar Configuración</button>
+                   <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Save size={16} /> Guardar Configuración
+                    </button>
+                   </div>
                 </div>
               </form>
             </div>

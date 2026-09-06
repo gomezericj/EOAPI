@@ -177,55 +177,93 @@ export default function ExpensesPage() {
 
         <div className="card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-            <AlertCircle size={20} color="#ef4444" />
-            <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
+            <AlertCircle size={20} color="var(--primary)" />
+            <h3 style={{ margin: 0, textTransform: 'capitalize', fontSize: '1.05rem', fontWeight: 700 }}>
               Desglose de Egresos
             </h3>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem' }}>
             {/* Total Gastos */}
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #dc2626', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2', borderTopWidth: '4px', borderTopColor: '#dc2626', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', flexShrink: 0 }}>
-                <TrendingDown size={22} />
+            <div className="card" style={{ padding: '0.95rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <TrendingDown size={15} color="#dc2626" />
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#dc2626' }}>TOTAL GASTOS</span>
+                </div>
               </div>
-              <div>
-                <small style={{ color: '#991b1b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Total Gastos</small>
-                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.15rem', color: '#dc2626', fontWeight: 800 }}>${totalExpenses.toLocaleString('es-CL')}</h3>
+              <div style={{ margin: '0.2rem 0', fontSize: '1.25rem', fontWeight: 800, color: '#dc2626' }}>
+                ${totalExpenses.toLocaleString('es-CL')}
+              </div>
+              <div style={{ height: '4px', width: '100%', backgroundColor: '#fef2f2', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '100%', backgroundColor: '#dc2626', borderRadius: '3px' }}></div>
               </div>
             </div>
 
             {/* Vale Personal */}
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #f97316', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f97316', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ffedd5', color: '#ea580c', flexShrink: 0 }}>
-                <Users size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Vale Personal</small>
-                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${valePersonalTotal.toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
+            {(() => {
+              const pct = totalExpenses > 0 ? Math.round((valePersonalTotal / totalExpenses) * 100) : 0;
+              return (
+                <div className="card" style={{ padding: '0.95rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <Users size={15} color="var(--text-light)" />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>Vale Personal</span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-light)' }}>{pct}%</span>
+                  </div>
+                  <div style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+                    ${valePersonalTotal.toLocaleString('es-CL')}
+                  </div>
+                  <div style={{ height: '4px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, backgroundColor: 'var(--secondary)', borderRadius: '3px' }}></div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Gasto Clínica */}
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #ef4444', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#ef4444', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
-                <Building2 size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Gasto Clínica</small>
-                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${gastoClinicaTotal.toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
+            {(() => {
+              const pct = totalExpenses > 0 ? Math.round((gastoClinicaTotal / totalExpenses) * 100) : 0;
+              return (
+                <div className="card" style={{ padding: '0.95rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <Building2 size={15} color="var(--text-light)" />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>Gasto Clínica</span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-light)' }}>{pct}%</span>
+                  </div>
+                  <div style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+                    ${gastoClinicaTotal.toLocaleString('es-CL')}
+                  </div>
+                  <div style={{ height: '4px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, backgroundColor: 'var(--secondary)', borderRadius: '3px' }}></div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Otro */}
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #64748b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#64748b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', flexShrink: 0 }}>
-                <Receipt size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Otro</small>
-                <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${otroTotal.toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
+            {(() => {
+              const pct = totalExpenses > 0 ? Math.round((otroTotal / totalExpenses) * 100) : 0;
+              return (
+                <div className="card" style={{ padding: '0.95rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <Receipt size={15} color="var(--text-light)" />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>Otro</span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-light)' }}>{pct}%</span>
+                  </div>
+                  <div style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+                    ${otroTotal.toLocaleString('es-CL')}
+                  </div>
+                  <div style={{ height: '4px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, backgroundColor: '#94a3b8', borderRadius: '3px' }}></div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </header>
@@ -287,11 +325,11 @@ export default function ExpensesPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '450px' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
+            <div className="card" style={{ width: '480px', position: 'relative' }}>
+              <button type="button" className="modal-close-btn" onClick={() => setShowModal(false)}>
+                <X size={18} />
               </button>
-              <h2>Registrar Egreso</h2>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 700, margin: '0 0 1.25rem 0', color: 'var(--primary)' }}>Registrar Egreso</h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="form-label">Fecha</label>
@@ -317,9 +355,9 @@ export default function ExpensesPage() {
                   <label className="form-label">Monto de Efectivo</label>
                   <input type="number" className="form-control" value={formData.amount} onChange={e => setFormData({ ...formData, amount: Number(e.target.value) })} required />
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary" style={{ backgroundColor: 'var(--danger)' }}>Confirmar Egreso</button>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)', backgroundColor: '#f8fafc', color: 'var(--text)' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary">Confirmar Egreso</button>
                 </div>
               </form>
             </div>

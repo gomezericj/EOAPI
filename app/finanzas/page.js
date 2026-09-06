@@ -68,20 +68,20 @@ export default function FinanzasPage() {
   const InfoCard = ({ title, value, icon: Icon, color, showPercent = true, children }) => {
     const pct = getPercentage(value);
     return (
-      <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem', borderLeft: `4px solid ${color}` }}>
-        <div style={{ backgroundColor: `${color}15`, padding: '1rem', borderRadius: '12px', color: color }}>
-          <Icon size={24} />
+      <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem' }}>
+        <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.85rem', borderRadius: '10px', color: color }}>
+          <Icon size={22} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-            <p style={{ color: 'var(--text-light)', fontSize: '0.875rem', fontWeight: 600, margin: 0, textTransform: 'uppercase' }}>{title}</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.2rem' }}>
+            <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600, margin: 0, textTransform: 'uppercase' }}>{title}</p>
             {showPercent && (
-              <span style={{ backgroundColor: `${color}15`, color: color, padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+              <span style={{ backgroundColor: '#f1f5f9', color: 'var(--text)', border: '1px solid #e2e8f0', padding: '2px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 700 }}>
                 {pct}%
               </span>
             )}
           </div>
-          <h3 style={{ margin: 0, fontSize: '1.5rem', color: color }}>
+          <h3 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
             ${Math.round(value || 0).toLocaleString('es-CL')}
           </h3>
           {children}

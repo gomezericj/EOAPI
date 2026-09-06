@@ -167,50 +167,96 @@ export default function TargetsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '400px' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2>Establecer Meta</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Mes</label>
-                  <select 
-                    className="form-control" 
-                    value={formData.month} 
-                    onChange={e => setFormData({...formData, month: parseInt(e.target.value)})}
-                  >
-                    {months.map((m, i) => (
-                      <option key={m} value={i + 1}>{m}</option>
-                    ))}
-                  </select>
+            <div className="card" style={{ width: '480px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Target size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Meta Mensual' : 'Establecer Meta Mensual'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Objetivo de recaudación mensual para el dashboard financiero.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Mes de Evaluación</label>
+                      <select 
+                        className="form-control" 
+                        value={formData.month} 
+                        onChange={e => setFormData({...formData, month: parseInt(e.target.value)})}
+                        style={{ marginBottom: 0 }}
+                      >
+                        {months.map((m, i) => (
+                          <option key={m} value={i + 1}>{m}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Año</label>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        value={formData.year} 
+                        onChange={e => setFormData({...formData, year: parseInt(e.target.value)})} 
+                        required 
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Monto Objetivo a Recaudar ($)</label>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ padding: '0 0.75rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRight: 'none', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', fontWeight: 700, color: '#64748b' }}>$</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        value={formData.amount} 
+                        onChange={e => setFormData({...formData, amount: parseFloat(e.target.value)})} 
+                        required 
+                        placeholder="Ej: 15000000"
+                        style={{ margin: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, fontSize: '0.95rem', fontWeight: 600 }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Año</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    value={formData.year} 
-                    onChange={e => setFormData({...formData, year: parseInt(e.target.value)})} 
-                    required 
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Monto Objetivo ($)</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    value={formData.amount} 
-                    onChange={e => setFormData({...formData, amount: parseFloat(e.target.value)})} 
-                    required 
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar</button>
+                {/* Footer de Acciones */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>Guardar Meta</button>
                 </div>
               </form>
             </div>

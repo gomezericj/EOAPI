@@ -112,66 +112,97 @@ export default function CierresPage() {
         <div style={{ textAlign: 'center', marginTop: '4rem' }}>Cargando reporte...</div>
       ) : report && (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-            <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #f59e0b' }}>
-              <div style={{ padding: '1rem', borderRadius: '50%', backgroundColor: '#fef3c7', color: '#f59e0b' }}><TrendingUp size={28} /></div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.9rem' }}>Venta Clínica (Tratamientos del {displayDate})</small>
-                <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.8rem' }}>${(report.clinicalSaleTotal || 0).toLocaleString('es-CL')}</h3>
+          {/* Top 2 Cards: Venta Clínica & Total Recaudado */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
+            <div className="card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <span style={{ color: 'var(--text-light)', fontSize: '0.82rem', fontWeight: 600 }}>Venta Clínica ({displayDate})</span>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <TrendingUp size={20} />
+                </div>
               </div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #3b82f6' }}>
-              <div style={{ padding: '1rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6' }}><DollarSign size={28} /></div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.9rem' }}>Total Recaudado (Caja Fuerte)</small>
-                <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.8rem' }}>${((report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0)).toLocaleString('es-CL')}</h3>
+              <div style={{ margin: '0.4rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>
+                ${(report.clinicalSaleTotal || 0).toLocaleString('es-CL')}
               </div>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Tratamientos facturados en el día</small>
             </div>
+
+            {(() => {
+              const totalRecaudado = (report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0);
+              return (
+                <div className="card" style={{ padding: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ color: 'var(--text-light)', fontSize: '0.82rem', fontWeight: 600 }}>Total Recaudado (Caja Fuerte)</span>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <DollarSign size={20} />
+                    </div>
+                  </div>
+                  <div style={{ margin: '0.4rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>
+                    ${totalRecaudado.toLocaleString('es-CL')}
+                  </div>
+                  <small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Ingresos netos percibidos en caja</small>
+                </div>
+              );
+            })()}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '2rem' }}>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #10b981', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981' }}><DollarSign size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Efectivo</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.cashTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid var(--secondary)', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f9ff', color: 'var(--secondary)' }}><CreditCard size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Transbank</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${((report.debitTotal || 0) + (report.creditTotal || 0)).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #f59e0b', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f59e0b' }}><TrendingUp size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Transferencia</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.transferTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #8b5cf6', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f5f3ff', color: '#8b5cf6' }}><Shield size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Seguros</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.insuranceTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #0284c7', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7' }}><Building2 size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Isapre</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.isapreTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #0d9488', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0fdfa', color: '#0d9488' }}><HeartPulse size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Fonasa</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.fonasaTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-            <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', borderTop: '4px solid #ef4444', padding: '1rem 0.75rem' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444' }}><Users size={20} /></div>
-              <div><small style={{ color: 'var(--text-light)', fontSize: '0.75rem' }}>Pendiente</small><h3 style={{ margin: 0, fontSize: '1.1rem' }}>${(report.pendingTotal || 0).toLocaleString('es-CL')}</h3></div>
-            </div>
-          </div>
+          {/* Desglose de Medios de Pago en Cierre Diario */}
+          {(() => {
+            const totalRecaudado = (report.cashTotal || 0) + (report.debitTotal || 0) + (report.creditTotal || 0) + (report.insuranceTotal || 0) + (report.transferTotal || 0) + (report.isapreTotal || 0) + (report.fonasaTotal || 0);
+            const methods = [
+              { label: 'Efectivo', amount: report.cashTotal || 0, icon: DollarSign },
+              { label: 'Transbank', amount: (report.debitTotal || 0) + (report.creditTotal || 0), icon: CreditCard },
+              { label: 'Transferencia', amount: report.transferTotal || 0, icon: TrendingUp },
+              { label: 'Seguros', amount: report.insuranceTotal || 0, icon: Shield },
+              { label: 'Isapre', amount: report.isapreTotal || 0, icon: Building2 },
+              { label: 'Fonasa', amount: report.fonasaTotal || 0, icon: HeartPulse },
+              { label: 'Pendiente', amount: report.pendingTotal || 0, icon: Users, isPending: true },
+            ];
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '0.85rem', marginBottom: '2rem' }}>
+                {methods.map((m, idx) => {
+                  const IconComp = m.icon;
+                  const pct = totalRecaudado > 0 && !m.isPending ? Math.round((m.amount / totalRecaudado) * 100) : 0;
+                  return (
+                    <div key={idx} className="card" style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <IconComp size={15} color={m.isPending ? '#d97706' : 'var(--text-light)'} />
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: m.isPending ? '#b45309' : 'var(--text)' }}>{m.label}</span>
+                        </div>
+                        {!m.isPending && (
+                          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-light)' }}>{pct}%</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: m.isPending ? '#b45309' : '#0f172a' }}>
+                        ${m.amount.toLocaleString('es-CL')}
+                      </div>
+                      {!m.isPending ? (
+                        <div style={{ height: '3px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${pct}%`, backgroundColor: 'var(--secondary)', borderRadius: '2px' }}></div>
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '0.7rem', color: '#b45309' }}>Por cobrar</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {report.isSaved && (
-            <div className="card" style={{ marginBottom: '2rem', backgroundColor: '#e0f2fe', color: '#0369a1', borderColor: '#bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <CheckCircle2 size={24} />
+            <div className="card" style={{ marginBottom: '2rem', backgroundColor: '#f0fdf4', color: '#166534', borderColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <CheckCircle2 size={22} color="#16a34a" />
                 <div>
-                  <strong>Este cierre ya ha sido guardado.</strong>
-                  <p style={{ fontSize: '0.8rem', margin: 0 }}>Registrado el: {new Date(report.savedAt).toLocaleString('es-CL')}</p>
+                  <strong style={{ fontSize: '0.95rem' }}>Este cierre ya ha sido guardado.</strong>
+                  <p style={{ fontSize: '0.8rem', margin: 0, opacity: 0.9 }}>Registrado el: {new Date(report.savedAt).toLocaleString('es-CL')}</p>
                 </div>
               </div>
               {isAdmin && (
                 <button className="btn btn-danger" onClick={handleDeleteClosure} title="Eliminar Cierre" disabled={saving}>
-                  <Trash2 size={20} />
+                  <Trash2 size={18} />
                   {saving ? 'Eliminando...' : 'Eliminar Cierre'}
                 </button>
               )}

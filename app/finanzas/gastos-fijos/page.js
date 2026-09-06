@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit, Save, X } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, DollarSign } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
 import Portal from '@/components/Portal';
@@ -110,27 +110,94 @@ export default function GastosFijosPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '450px' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar' : 'Nuevo'} Gasto Fijo</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Nombre del Gasto</label>
-                  <input type="text" className="form-control" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required placeholder="Ej. Arriendo" />
+            <div className="card" style={{ width: '500px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <DollarSign size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Gasto Fijo' : 'Nuevo Gasto Fijo'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Costos recurrentes fijos imputados mes a mes a la clínica.
+                    </p>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Descripción</label>
-                  <textarea className="form-control" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required rows="3" placeholder="Detalles del gasto..."></textarea>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Nombre del Gasto</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      value={formData.name} 
+                      onChange={e => setFormData({...formData, name: e.target.value})} 
+                      required 
+                      placeholder="Ej: Arriendo, Internet, Software Dental..." 
+                      style={{ marginBottom: 0 }}
+                    />
+                  </div>
+                  
+                  <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Descripción o Notas</label>
+                    <textarea 
+                      className="form-control" 
+                      value={formData.description} 
+                      onChange={e => setFormData({...formData, description: e.target.value})} 
+                      required 
+                      rows="2" 
+                      placeholder="Detalles sobre contrato o proveedor..."
+                      style={{ marginBottom: 0 }}
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Monto Fijo Mensual ($)</label>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ padding: '0 0.75rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRight: 'none', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', fontWeight: 700, color: '#64748b' }}>$</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        value={formData.amount} 
+                        onChange={e => setFormData({...formData, amount: Number(e.target.value)})} 
+                        required 
+                        min="0" 
+                        style={{ margin: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, fontSize: '0.95rem', fontWeight: 600 }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Monto (por mes)</label>
-                  <input type="number" className="form-control" value={formData.amount} onChange={e => setFormData({...formData, amount: Number(e.target.value)})} required min="0" />
-                </div>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary"><Save size={16} style={{ marginRight: '0.5rem' }} /> Guardar</button>
+
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>
+                    <Save size={16} style={{ marginRight: '0.4rem' }} /> Guardar Gasto
+                  </button>
                 </div>
               </form>
             </div>

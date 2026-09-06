@@ -186,105 +186,161 @@ export default function UsersPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '500px' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h2>
-              <form onSubmit={handleSubmit} autoComplete="off">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Nombre</label>
+            <div className="card" style={{ width: '540px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Shield size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Acceso al sistema, credenciales y nivel de permisos.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                
+                {/* Bloque 1: Identificación y Acceso */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Nombre</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        required
+                        placeholder="Ej: Laura"
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Apellido</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.surname}
+                        onChange={e => setFormData({ ...formData, surname: e.target.value })}
+                        required
+                        placeholder="Ej: Morales"
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Correo Electrónico</label>
                     <input
-                      type="text"
+                      type="email"
                       className="form-control"
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
                       required
+                      autoComplete="off"
+                      placeholder="usuario@clinicadental.cl"
+                      style={{ marginBottom: 0 }}
                     />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Apellido</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.surname}
-                      onChange={e => setFormData({ ...formData, surname: e.target.value })}
-                      required
-                    />
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Contraseña de Acceso</span>
+                      {formData._id && <span style={{ fontSize: '0.72rem', color: 'var(--text-light)', fontWeight: 500 }}>(En blanco para mantener actual)</span>}
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        value={formData.password}
+                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                        required={!formData._id}
+                        style={{ paddingRight: '2.5rem', marginBottom: 0 }}
+                        autoComplete="new-password"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '0.75rem',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-light)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Correo Electrónico</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    autoComplete="off"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">
-                    Contraseña
-                    {formData._id && <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginLeft: '0.5rem', fontWeight: 'normal' }}>(Dejar en blanco para mantener actual)</span>}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type={showPassword ? "text" : "password"}
+                {/* Bloque 2: Permisos y Nivel de Rol */}
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                      Rol y Nivel de Permisos
+                    </label>
+                    <select
                       className="form-control"
-                      value={formData.password}
-                      onChange={e => setFormData({ ...formData, password: e.target.value })}
-                      required={!formData._id}
-                      style={{ paddingRight: '2.5rem' }}
-                      autoComplete="new-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{
-                        position: 'absolute',
-                        right: '0.75rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-light)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
+                      value={formData.role}
+                      onChange={e => setFormData({ ...formData, role: e.target.value })}
+                      disabled={formData._id === session?.user?.id}
+                      style={{ marginBottom: '0.35rem' }}
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                      <option value="user">Usuario Estándar (Ventas, Pacientes y Cierres Diarios)</option>
+                      {(isAdmin || isSuperAdmin) && (
+                         <option value="admin">Administrador (Gestión de Catálogos, Gastos y Configuración)</option>
+                      )}
+                      {formData.role === 'superadmin' && (
+                         <option value="superadmin">Súper Administrador (Control Total del Sistema)</option>
+                      )}
+                    </select>
+                    <small style={{ fontSize: '0.72rem', color: 'var(--text-light)' }}>
+                      Los permisos determinan las opciones del menú lateral a las que tiene acceso el usuario.
+                    </small>
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Rol del Usuario</label>
-                  <select
-                    className="form-control"
-                    value={formData.role}
-                    onChange={e => setFormData({ ...formData, role: e.target.value })}
-                    disabled={formData._id === session?.user?.id}
-                  >
-                    <option value="user">Usuario (Ventas y Pacientes)</option>
-                    {(isAdmin || isSuperAdmin) && (
-                       <option value="admin">Administrador (Gestión Configuración)</option>
-                    )}
-                    {formData.role === 'superadmin' && (
-                       <option value="superadmin">Súper Administrador (Control Total)</option>
-                    )}
-                  </select>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">{formData._id ? 'Guardar Cambios' : 'Crear Usuario'}</button>
+                {/* Footer de Acciones */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>
+                    {formData._id ? 'Guardar Cambios' : 'Crear Usuario'}
+                  </button>
                 </div>
               </form>
             </div>

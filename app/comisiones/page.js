@@ -100,30 +100,30 @@ export default function ComisionesPage() {
 
       {report && !report.isGlobal && (
         <>
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-            <div className="card" style={{ borderLeft: '4px solid var(--text-light)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Monto Total Facturado</small>
-              <h3 style={{ margin: 0 }}>${report?.totals?.totalFacturado?.toLocaleString('es-CL') || '0'}</h3>
+          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Monto Total Facturado</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>${report?.totals?.totalFacturado?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Total Descuentos</small>
-              <h3 style={{ margin: 0, color: 'var(--danger)' }}>-${report?.totals?.totalDescuentos?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Total Descuentos</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#b45309' }}>-${report?.totals?.totalDescuentos?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Subtotal (Total - Desc.)</small>
-              <h3 style={{ margin: 0 }}>${report?.totals?.subtotal?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Subtotal (Neto)</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>${report?.totals?.subtotal?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--secondary)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Comisión Generada</small>
-              <h3 style={{ margin: 0 }}>${report?.totals?.commissionAmount?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Comisión Generada</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#025158' }}>${report?.totals?.commissionAmount?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid #ef4444' }}>
-              <small style={{ color: 'var(--text-light)' }}>Retención ({report?.retentionPercentage || 13}%)</small>
-              <h3 style={{ margin: 0 }}>-${report?.totals?.retention?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Retención ({report?.retentionPercentage || 13}%)</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#64748b' }}>-${report?.totals?.retention?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--success)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Líquido a Pagar</small>
-              <h1 style={{ margin: 0, fontSize: '1.75rem', color: 'var(--success)' }}>${report?.totals?.totalLiquid?.toLocaleString('es-CL') || '0'}</h1>
+            <div className="card" style={{ padding: '1.15rem', backgroundColor: '#f0fdf4', borderColor: '#dcfce7' }}>
+              <small style={{ color: '#166534', fontSize: '0.8rem', fontWeight: 700 }}>LÍQUIDO A PAGAR</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.6rem', fontWeight: 800, color: '#15803d' }}>${report?.totals?.totalLiquid?.toLocaleString('es-CL') || '0'}</h3>
             </div>
           </div>
 
@@ -257,26 +257,26 @@ export default function ComisionesPage() {
 
       {report && report.isGlobal && (
         <>
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-            <div className="card" style={{ borderLeft: '4px solid var(--text-light)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Total Facturado Global</small>
-              <h3 style={{ margin: 0 }}>${report?.globalTotals?.totalFacturado?.toLocaleString('es-CL') || '0'}</h3>
+          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Total Facturado Global</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>${report?.globalTotals?.totalFacturado?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Total Descuentos Global</small>
-              <h3 style={{ margin: 0, color: 'var(--danger)' }}>-${report?.globalTotals?.totalDescuentos?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Total Descuentos Global</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#b45309' }}>-${report?.globalTotals?.totalDescuentos?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Subtotal Global</small>
-              <h3 style={{ margin: 0 }}>${report?.globalTotals?.subtotal?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Subtotal Global</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>${report?.globalTotals?.subtotal?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid #ef4444' }}>
-              <small style={{ color: 'var(--text-light)' }}>Retenciones Globales ({report?.retentionPercentage || 13}%)</small>
-              <h3 style={{ margin: 0 }}>-${report?.globalTotals?.retention?.toLocaleString('es-CL') || '0'}</h3>
+            <div className="card" style={{ padding: '1.15rem' }}>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: 600 }}>Retenciones Globales ({report?.retentionPercentage || 13}%)</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.45rem', fontWeight: 800, color: '#64748b' }}>-${report?.globalTotals?.retention?.toLocaleString('es-CL') || '0'}</h3>
             </div>
-            <div className="card" style={{ borderLeft: '4px solid var(--success)' }}>
-              <small style={{ color: 'var(--text-light)' }}>Total a Pagar Doctores</small>
-              <h1 style={{ margin: 0, fontSize: '1.75rem', color: 'var(--success)' }}>${report?.globalTotals?.totalLiquid?.toLocaleString('es-CL') || '0'}</h1>
+            <div className="card" style={{ padding: '1.15rem', backgroundColor: '#f0fdf4', borderColor: '#dcfce7' }}>
+              <small style={{ color: '#166534', fontSize: '0.8rem', fontWeight: 700 }}>TOTAL A PAGAR DOCTORES</small>
+              <h3 style={{ margin: '0.35rem 0 0 0', fontSize: '1.6rem', fontWeight: 800, color: '#15803d' }}>${report?.globalTotals?.totalLiquid?.toLocaleString('es-CL') || '0'}</h3>
             </div>
           </div>
 

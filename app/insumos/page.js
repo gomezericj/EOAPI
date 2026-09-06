@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Package, Trash2, Tag, Truck, Edit, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import { useSession } from 'next-auth/react';
+import Portal from '@/components/Portal';
 
 export default function SuppliesPage() {
   const { data: session } = useSession();
@@ -199,87 +200,133 @@ export default function SuppliesPage() {
       </div>
 
       {showModal && (
-        <div className="modal-overlay" style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }}>
-          <div className="card" style={{ width: '500px', position: 'relative' }}>
-            <button 
-              type="button"
-              onClick={() => setShowModal(false)}
-              style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}
-            >
-              <X size={20} />
-            </button>
-            <h2>{formData._id ? 'Editar Descuento/Costo' : 'Registrar Descuento o Costo'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Nombre del Descuento/Costo</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="Ej: Anestesia Carpule"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Categoría</label>
-                <select
-                  className="form-control"
-                  value={formData.category}
-                  onChange={e => setFormData({ ...formData, category: e.target.value })}
-                >
-                  <option value="Insumo">Insumo Médico</option>
-                  <option value="Laboratorio">Laboratorio</option>
-                  <option value="Otros">Otros</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Costo ($)</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  value={formData.unitPrice}
-                  onChange={e => setFormData({ ...formData, unitPrice: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Proveedor</label>
-                <select
-                  className="form-control"
-                  value={formData.providerId || ""}
-                  onChange={e => {
-                    const id = e.target.value;
-                    const provider = providers.find(p => p._id === id);
-                    setFormData({ 
-                      ...formData, 
-                      providerId: id, 
-                      providerName: provider ? provider.name : '' 
-                    });
+        <Portal>
+          <div className="modal-overlay">
+            <div className="card" style={{ width: '540px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Package size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Descuento / Costo' : 'Registrar Insumo o Costo'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Insumos médicos, servicios de laboratorio o costos deducibles en venta.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
                   }}
-                  required
                 >
-                  <option value="">Seleccione un proveedor...</option>
-                  {providers.map(p => (
-                    <option key={p._id} value={p._id}>{p.name}</option>
-                  ))}
-                </select>
+                  <X size={18} />
+                </button>
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                <button type="submit" className="btn btn-primary">Guardar</button>
-              </div>
-            </form>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                      Nombre del Insumo o Servicio
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      placeholder="Ej: Anestesia Carpule, Corona Zirconio..."
+                      style={{ marginBottom: 0 }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Categoría</label>
+                      <select
+                        className="form-control"
+                        value={formData.category}
+                        onChange={e => setFormData({ ...formData, category: e.target.value })}
+                        style={{ marginBottom: 0 }}
+                      >
+                        <option value="Insumo">Insumo Médico</option>
+                        <option value="Laboratorio">Laboratorio</option>
+                        <option value="Otros">Otros</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Costo Unitario ($)</label>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ padding: '0 0.65rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRight: 'none', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', fontWeight: 700, color: '#64748b' }}>$</span>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.unitPrice}
+                          onChange={e => setFormData({ ...formData, unitPrice: e.target.value })}
+                          required
+                          placeholder="0"
+                          style={{ margin: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Truck size={15} color="var(--primary)" /> Proveedor Asignado
+                    </label>
+                    <select
+                      className="form-control"
+                      value={formData.providerId || ""}
+                      onChange={e => {
+                        const id = e.target.value;
+                        const provider = providers.find(p => p._id === id);
+                        setFormData({ 
+                          ...formData, 
+                          providerId: id, 
+                          providerName: provider ? provider.name : '' 
+                        });
+                      }}
+                      required
+                      style={{ marginBottom: 0 }}
+                    >
+                      <option value="">Seleccione un proveedor de la lista...</option>
+                      {providers.map(p => (
+                        <option key={p._id} value={p._id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>Guardar</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );

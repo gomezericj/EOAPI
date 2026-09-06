@@ -311,62 +311,289 @@ export default function DoctorsPage() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '1rem', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
-                  <h4>Comisiones por Especialidad</h4>
-                  <div className="form-group" style={{ marginBottom: '1rem' }}>
-                    <label className="form-label">Comisión por Defecto (%)</label>
-                    <input type="number" className="form-control" value={formData.defaultCommissionPercentage} onChange={e => setFormData({ ...formData, defaultCommissionPercentage: e.target.value })} disabled={!isAdmin} required />
-                    <small style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>Se aplicará a procedimientos que no coincidan con las especialidades abajo detalladas.</small>
+                {/* Bloque Destacado de Configuración de Comisiones */}
+                <div style={{ 
+                  marginTop: '1.5rem', 
+                  backgroundColor: '#f8fafc', 
+                  border: '1px solid #e2e8f0', 
+                  borderRadius: '14px', 
+                  padding: '1.25rem' 
+                }}>
+                  {/* Encabezado del Bloque de Comisiones */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f0fdfa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Percent size={18} />
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: 'var(--primary)' }}>
+                        Esquema de Comisiones y Compensación
+                      </h4>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                        Define las tasas porcentuales de pago por procedimientos y condiciones tributarias.
+                      </p>
+                    </div>
                   </div>
-                  <div className="form-group" style={{ marginBottom: '1rem' }}>
-                    <label className="form-label">Comisión por Paciente Referido (%)</label>
-                    <input type="number" className="form-control" value={formData.referredPatientCommissionPercentage} onChange={e => setFormData({ ...formData, referredPatientCommissionPercentage: e.target.value })} disabled={!isAdmin} required />
-                    <small style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>Se aplicará si el doctor realiza un procedimiento a un paciente referido por él mismo (Ignora las especialidades).</small>
-                  </div>
-                  
-                  {formData.specialtyCommissions.map((sc, idx) => (
-                    <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '1rem', alignItems: 'end', marginBottom: '0.5rem' }}>
-                      <div className="form-group">
-                        <label className="form-label">Especialidad</label>
-                        <select className="form-control" value={sc.specialty} onChange={e => {
-                          const newCommissions = [...formData.specialtyCommissions];
-                          newCommissions[idx].specialty = e.target.value;
-                          setFormData({ ...formData, specialtyCommissions: newCommissions });
-                        }} disabled={!isAdmin} required>
-                          <option value="">Seleccione...</option>
-                          {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
-                        </select>
+
+                  {/* Nivel 1: Comisiones Generales (Base vs Referido) */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '1.25rem' }}>
+                    {/* Comisión Base */}
+                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.95rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                        <label className="form-label" style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700 }}>
+                          Comisión Base
+                        </label>
+                        <span className="badge-neutral" style={{ fontSize: '0.65rem' }}>General</span>
                       </div>
-                      <div className="form-group">
-                        <label className="form-label">Comisión (%)</label>
-                        <input type="number" className="form-control" value={sc.percentage} onChange={e => {
-                          const newCommissions = [...formData.specialtyCommissions];
-                          newCommissions[idx].percentage = e.target.value;
-                          setFormData({ ...formData, specialtyCommissions: newCommissions });
-                        }} disabled={!isAdmin} required />
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-light)', margin: '0 0 0.65rem 0', minHeight: '28px' }}>
+                        Tarifa estándar para tratamientos habituales del doctor.
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="number" 
+                          className="form-control" 
+                          value={formData.defaultCommissionPercentage} 
+                          onChange={e => setFormData({ ...formData, defaultCommissionPercentage: e.target.value })} 
+                          disabled={!isAdmin} 
+                          required 
+                          style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                        />
+                        <span style={{ 
+                          padding: '0 0.85rem', 
+                          height: '42px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          backgroundColor: '#f1f5f9', 
+                          border: '1px solid #cbd5e1', 
+                          borderLeft: 'none', 
+                          borderTopRightRadius: '10px', 
+                          borderBottomRightRadius: '10px', 
+                          fontWeight: 700, 
+                          color: 'var(--text-light)', 
+                          fontSize: '0.85rem' 
+                        }}>
+                          %
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Comisión Paciente Referido */}
+                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.95rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                        <label className="form-label" style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700 }}>
+                          Paciente Referido
+                        </label>
+                        <span className="badge-success" style={{ fontSize: '0.65rem' }}>Prioritaria</span>
+                      </div>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-light)', margin: '0 0 0.65rem 0', minHeight: '28px' }}>
+                        Aplica si el paciente fue captado o referido por el doctor.
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="number" 
+                          className="form-control" 
+                          value={formData.referredPatientCommissionPercentage} 
+                          onChange={e => setFormData({ ...formData, referredPatientCommissionPercentage: e.target.value })} 
+                          disabled={!isAdmin} 
+                          required 
+                          style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                        />
+                        <span style={{ 
+                          padding: '0 0.85rem', 
+                          height: '42px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          backgroundColor: '#f1f5f9', 
+                          border: '1px solid #cbd5e1', 
+                          borderLeft: 'none', 
+                          borderTopRightRadius: '10px', 
+                          borderBottomRightRadius: '10px', 
+                          fontWeight: 700, 
+                          color: 'var(--text-light)', 
+                          fontSize: '0.85rem' 
+                        }}>
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nivel 2: Excepciones por Especialidad */}
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                      <div>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)' }}>
+                          Tarifas Especiales por Especialidad
+                        </span>
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-light)', margin: 0 }}>
+                          Sobrescribe la comisión base cuando el doctor ejecuta procedimientos de estas áreas.
+                        </p>
                       </div>
                       {isAdmin && (
-                        <button type="button" className="btn-action-delete" onClick={() => {
-                          const newCommissions = formData.specialtyCommissions.filter((_, i) => i !== idx);
-                          setFormData({ ...formData, specialtyCommissions: newCommissions });
-                        }} style={{ padding: '0.5rem' }}><Trash2 size={18} /></button>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setFormData({ ...formData, specialtyCommissions: [...formData.specialtyCommissions, { specialty: '', percentage: formData.defaultCommissionPercentage }] });
+                          }}
+                          style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '0.35rem', 
+                            fontSize: '0.78rem', 
+                            fontWeight: 600, 
+                            padding: '0.35rem 0.75rem', 
+                            borderRadius: '8px', 
+                            backgroundColor: '#ffffff', 
+                            border: '1px solid var(--primary)', 
+                            color: 'var(--primary)', 
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <Plus size={14} /> Añadir Especialidad
+                        </button>
                       )}
                     </div>
-                  ))}
-                  
-                  {isAdmin && (
-                    <button type="button" className="btn" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }} onClick={() => {
-                      setFormData({ ...formData, specialtyCommissions: [...formData.specialtyCommissions, { specialty: '', percentage: formData.defaultCommissionPercentage }] });
-                    }}>
-                      <Plus size={14} /> Añadir Especialidad
-                    </button>
-                  )}
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', marginTop: '1rem', gap: '0.5rem' }}>
-                    <input type="checkbox" id="hasInvoice" checked={formData.hasInvoice} onChange={e => setFormData({ ...formData, hasInvoice: e.target.checked })} disabled={!isAdmin} />
-                    <label htmlFor="hasInvoice" className="form-label" style={{ marginBottom: 0 }}>¿Emite Factura? (Si NO emite factura, aplica Retención {systemRetention}% Boleta)</label>
+                    {formData.specialtyCommissions.length === 0 ? (
+                      <div style={{ 
+                        padding: '1rem', 
+                        textAlign: 'center', 
+                        backgroundColor: '#ffffff', 
+                        border: '1px dashed #cbd5e1', 
+                        borderRadius: '10px', 
+                        color: 'var(--text-light)', 
+                        fontSize: '0.78rem' 
+                      }}>
+                        No hay tarifas específicas configuradas. Se aplicará la <strong>Comisión Base ({formData.defaultCommissionPercentage || 0}%)</strong> para cualquier especialidad.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {formData.specialtyCommissions.map((sc, idx) => (
+                          <div 
+                            key={idx} 
+                            style={{ 
+                              display: 'grid', 
+                              gridTemplateColumns: '1.8fr 1fr auto', 
+                              gap: '0.75rem', 
+                              alignItems: 'center', 
+                              backgroundColor: '#ffffff', 
+                              border: '1px solid #e2e8f0', 
+                              borderRadius: '10px', 
+                              padding: '0.65rem 0.85rem' 
+                            }}
+                          >
+                            <div>
+                              <select 
+                                className="form-control" 
+                                value={sc.specialty} 
+                                onChange={e => {
+                                  const newCommissions = [...formData.specialtyCommissions];
+                                  newCommissions[idx].specialty = e.target.value;
+                                  setFormData({ ...formData, specialtyCommissions: newCommissions });
+                                }} 
+                                disabled={!isAdmin} 
+                                required
+                                style={{ margin: 0, fontSize: '0.85rem' }}
+                              >
+                                <option value="">Seleccione Especialidad...</option>
+                                {specialties.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
+                              </select>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <input 
+                                type="number" 
+                                className="form-control" 
+                                value={sc.percentage} 
+                                onChange={e => {
+                                  const newCommissions = [...formData.specialtyCommissions];
+                                  newCommissions[idx].percentage = e.target.value;
+                                  setFormData({ ...formData, specialtyCommissions: newCommissions });
+                                }} 
+                                disabled={!isAdmin} 
+                                required 
+                                style={{ margin: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0, fontSize: '0.85rem' }}
+                              />
+                              <span style={{ 
+                                padding: '0 0.65rem', 
+                                height: '40px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                backgroundColor: '#f1f5f9', 
+                                border: '1px solid #cbd5e1', 
+                                borderLeft: 'none', 
+                                borderTopRightRadius: '10px', 
+                                borderBottomRightRadius: '10px', 
+                                fontWeight: 700, 
+                                color: 'var(--text-light)', 
+                                fontSize: '0.8rem' 
+                              }}>
+                                %
+                              </span>
+                            </div>
+                            {isAdmin && (
+                              <button 
+                                type="button" 
+                                className="btn-action-delete" 
+                                onClick={() => {
+                                  const newCommissions = formData.specialtyCommissions.filter((_, i) => i !== idx);
+                                  setFormData({ ...formData, specialtyCommissions: newCommissions });
+                                }} 
+                                title="Eliminar regla especial"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Nivel 3: Régimen Tributario y Retención */}
+                  <div style={{ 
+                    backgroundColor: '#ffffff', 
+                    border: '1px solid #e2e8f0', 
+                    borderRadius: '10px', 
+                    padding: '0.85rem 1rem', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    gap: '1rem' 
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div style={{ 
+                        width: '32px', 
+                        height: '32px', 
+                        borderRadius: '8px', 
+                        backgroundColor: formData.hasInvoice ? '#f0fdf4' : '#fffbeb', 
+                        color: formData.hasInvoice ? '#16a34a' : '#d97706', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <FileCheck size={18} />
+                      </div>
+                      <div>
+                        <label htmlFor="hasInvoice" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', cursor: 'pointer', margin: 0, display: 'block' }}>
+                          ¿El profesional emite Factura?
+                        </label>
+                        <small style={{ fontSize: '0.73rem', color: 'var(--text-light)' }}>
+                          {formData.hasInvoice 
+                            ? 'Exento de retención (pago íntegro contra factura)' 
+                            : `Aplica retención legal del ${systemRetention}% por boleta de honorarios en el cálculo mensual.`
+                          }
+                        </small>
+                      </div>
+                    </div>
+                    <input 
+                      type="checkbox" 
+                      id="hasInvoice" 
+                      checked={formData.hasInvoice} 
+                      onChange={e => setFormData({ ...formData, hasInvoice: e.target.checked })} 
+                      disabled={!isAdmin} 
+                      style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                    />
                   </div>
                 </div>
 

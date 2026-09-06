@@ -201,84 +201,155 @@ export default function ProvidersPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto' , position: 'relative'}}>
-              <button type="button" onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}>
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar Proveedor' : 'Registrar Proveedor'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">RUT</label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      value={formData.rut} 
-                      onChange={e => setFormData({ ...formData, rut: e.target.value })} 
-                      required 
-                    />
+            <div className="card" style={{ width: '580px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Truck size={20} />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Nombre / Razón Social</label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      value={formData.name} 
-                      onChange={e => setFormData({ ...formData, name: e.target.value })} 
-                      required 
-                    />
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Proveedor' : 'Registrar Proveedor'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Empresas y laboratorios de insumos, servicios y equipamiento dental.
+                    </p>
                   </div>
                 </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 
-                <div className="form-group">
-                  <label className="form-label">Dirección</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    value={formData.address} 
-                    onChange={e => setFormData({ ...formData, address: e.target.value })} 
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Rubro</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    value={formData.rubro} 
-                    onChange={e => setFormData({ ...formData, rubro: e.target.value })} 
-                    placeholder="Ej: Insumos Dentales, Servicios Médicos..."
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'end' }}>
-                  <div className="form-group">
-                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Bloque 1: Identificación y Contacto */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>RUT</label>
                       <input 
-                        type="checkbox" 
-                        checked={formData.credit} 
-                        onChange={e => setFormData({ ...formData, credit: e.target.checked })} 
-                      />
-                      ¿Ofrece Crédito?
-                    </label>
-                  </div>
-                  {formData.credit && (
-                    <div className="form-group">
-                      <label className="form-label">Días de Crédito</label>
-                      <input 
-                        type="number" 
+                        type="text" 
                         className="form-control" 
-                        value={formData.creditDays} 
-                        onChange={e => setFormData({ ...formData, creditDays: parseInt(e.target.value) || 0 })} 
-                        min="0"
+                        value={formData.rut} 
+                        onChange={e => setFormData({ ...formData, rut: e.target.value })} 
+                        required 
+                        placeholder="76.123.456-7"
+                        style={{ marginBottom: 0 }}
                       />
                     </div>
-                  )}
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>Razón Social / Nombre</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={formData.name} 
+                        onChange={e => setFormData({ ...formData, name: e.target.value })} 
+                        required 
+                        placeholder="Ej: Dental Express SpA"
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Rubro o Giro</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={formData.rubro} 
+                        onChange={e => setFormData({ ...formData, rubro: e.target.value })} 
+                        placeholder="Ej: Instrumental, Ortodoncia..."
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Dirección Comercial</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={formData.address} 
+                        onChange={e => setFormData({ ...formData, address: e.target.value })} 
+                        placeholder="Av. Providencia 1234, Of 502"
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar Proveedor</button>
+                {/* Bloque 2: Condiciones Comerciales y Crédito */}
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '6px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CreditCard size={14} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)' }}>
+                        Condiciones Comerciales
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Plazos y convenios de pago a crédito</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem' }}>
+                      <input 
+                        type="checkbox" 
+                        id="providerCredit"
+                        checked={formData.credit} 
+                        onChange={e => setFormData({ ...formData, credit: e.target.checked })} 
+                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                      />
+                      <label htmlFor="providerCredit" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)', cursor: 'pointer', margin: 0 }}>
+                        ¿Ofrece Crédito a la Clínica?
+                      </label>
+                    </div>
+
+                    {formData.credit ? (
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Plazo de Crédito (Días)</label>
+                        <input 
+                          type="number" 
+                          className="form-control" 
+                          value={formData.creditDays} 
+                          onChange={e => setFormData({ ...formData, creditDays: parseInt(e.target.value) || 0 })} 
+                          min="0"
+                          placeholder="30"
+                          style={{ marginBottom: 0 }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontStyle: 'italic' }}>
+                        Modalidad contado / transferencia contra entrega.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Footer de Acciones */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>Guardar Proveedor</button>
                 </div>
               </form>
             </div>

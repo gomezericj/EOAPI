@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, User, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt, Calendar, Loader2 } from 'lucide-react';
+import { Plus, Search, User, UserPlus, Phone, Mail, Edit, Trash2, Download, ToggleLeft, ToggleRight, FileText, ClipboardList, Activity, X, DollarSign, CreditCard, CheckCircle2, AlertCircle, Receipt, Calendar, Loader2 } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -300,114 +300,173 @@ export default function PatientsPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
-              <button 
-                type="button"
-                onClick={() => setShowModal(false)}
-                style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}
-              >
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar Paciente' : 'Registrar Paciente'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 105px', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">RUT / Pasaporte</label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="card" style={{ width: '640px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <UserPlus size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Paciente' : 'Registrar Paciente'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Ficha de identificación, datos de contacto y procedencia clínica.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                
+                {/* Bloque 1: Identificación y Dentalink */}
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 105px', gap: '1rem', alignItems: 'flex-start' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                        RUT / Pasaporte
+                      </label>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          value={formData.rut} 
+                          onChange={e => setFormData({ ...formData, rut: e.target.value })} 
+                          required 
+                          placeholder="12.345.678-9"
+                          style={{ marginBottom: 0 }}
+                        />
+                        {isDentalinkActive && (() => {
+                          const isRutEmpty = !formData.rut || formData.rut.trim() === '';
+                          const isSearchDisabled = searching || isRutEmpty;
+                          return (
+                            <button 
+                              type="button" 
+                              className="btn btn-dentalink-search" 
+                              onClick={searchInDentalink}
+                              disabled={isSearchDisabled}
+                              title={isRutEmpty ? "Ingrese un RUT para buscar en Dentalink" : "Buscar información del paciente en Dentalink por RUT"}
+                            >
+                              {searching ? (
+                                <>
+                                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                                  <span>Buscando...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <DentalinkIcon size={16} color={isSearchDisabled ? "#94a3b8" : "#ffffff"} />
+                                  <span>Buscar Dentalink</span>
+                                </>
+                              )}
+                            </button>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', textAlign: 'center', display: 'block' }}>
+                        Edad
+                      </label>
                       <input 
-                        type="text" 
+                        type="number" 
                         className="form-control" 
-                        value={formData.rut} 
-                        onChange={e => setFormData({ ...formData, rut: e.target.value })} 
-                        required 
-                        style={{ marginBottom: 0 }}
+                        value={formData.age} 
+                        onChange={e => setFormData({ ...formData, age: e.target.value })} 
+                        placeholder="0"
+                        style={{ textAlign: 'center', marginBottom: 0 }}
                       />
-                      {isDentalinkActive && (() => {
-                        const isRutEmpty = !formData.rut || formData.rut.trim() === '';
-                        const isSearchDisabled = searching || isRutEmpty;
-                        return (
-                          <button 
-                            type="button" 
-                            className="btn btn-dentalink-search" 
-                            onClick={searchInDentalink}
-                            disabled={isSearchDisabled}
-                            title={isRutEmpty ? "Ingrese un RUT para buscar en Dentalink" : "Buscar información del paciente en Dentalink por RUT"}
-                          >
-                            {searching ? (
-                              <>
-                                <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                                <span>Buscando...</span>
-                              </>
-                            ) : (
-                              <>
-                                <DentalinkIcon size={16} color={isSearchDisabled ? "#94a3b8" : "#ffffff"} />
-                                <span>Buscar Dentalink</span>
-                              </>
-                            )}
-                          </button>
-                        );
-                      })()}
                     </div>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Edad</label>
-                    <input 
-                      type="number" 
-                      className="form-control" 
-                      value={formData.age} 
-                      onChange={e => setFormData({ ...formData, age: e.target.value })} 
-                      placeholder="0"
-                      style={{ textAlign: 'center' }}
+                </div>
+
+                {/* Bloque 2: Nombre Completo */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.75rem' }}>
+                    Información Personal
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Primer Nombre</label>
+                      <input type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Segundo Nombre</label>
+                      <input type="text" className="form-control" value={formData.secondName} onChange={e => setFormData({ ...formData, secondName: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Primer Apellido</label>
+                      <input type="text" className="form-control" value={formData.surname} onChange={e => setFormData({ ...formData, surname: e.target.value })} required />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Segundo Apellido</label>
+                      <input type="text" className="form-control" value={formData.secondSurname} onChange={e => setFormData({ ...formData, secondSurname: e.target.value })} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bloque 3: Contacto y Derivación */}
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.75rem' }}>
+                    Contacto y Derivación
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Correo Electrónico</label>
+                      <input type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required placeholder="correo@ejemplo.cl" />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Teléfono Móvil</label>
+                      <input type="text" className="form-control" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} required placeholder="+56 9 1234 5678" />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Referido por Doctor (Opcional)</label>
+                    <Select
+                      instanceId="referredBy-select"
+                      placeholder="Seleccionar doctor referente..."
+                      noOptionsMessage={() => "No se encontraron doctores"}
+                      options={doctors.filter(d => d.isActive !== false).map(d => ({ value: d._id, label: `${d.name} ${d.surname}` }))}
+                      value={formData.referredByDoctorId ? { value: formData.referredByDoctorId, label: doctors.find(d => d._id === formData.referredByDoctorId) ? `${doctors.find(d => d._id === formData.referredByDoctorId).name} ${doctors.find(d => d._id === formData.referredByDoctorId).surname}` : 'Doctor' } : null}
+                      onChange={option => setFormData({ ...formData, referredByDoctorId: option ? option.value : '' })}
+                      styles={{ control: (base) => ({ ...base, minHeight: '40px', borderRadius: '8px', borderColor: '#cbd5e1', fontSize: '0.85rem' }) }}
+                      isClearable
+                      menuPosition="fixed"
                     />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Nombre</label>
-                    <input type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Segundo Nombre</label>
-                    <input type="text" className="form-control" value={formData.secondName} onChange={e => setFormData({ ...formData, secondName: e.target.value })} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Apellido</label>
-                    <input type="text" className="form-control" value={formData.surname} onChange={e => setFormData({ ...formData, surname: e.target.value })} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Segundo Apellido</label>
-                    <input type="text" className="form-control" value={formData.secondSurname} onChange={e => setFormData({ ...formData, secondSurname: e.target.value })} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Correo</label>
-                    <input type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Teléfono</label>
-                    <input type="text" className="form-control" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} required />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Referido por (Opcional)</label>
-                  <Select
-                    instanceId="referredBy-select"
-                    placeholder="Seleccione doctor..."
-                    noOptionsMessage={() => "No se encontraron doctores"}
-                    options={doctors.filter(d => d.isActive !== false).map(d => ({ value: d._id, label: `${d.name} ${d.surname}` }))}
-                    value={formData.referredByDoctorId ? { value: formData.referredByDoctorId, label: doctors.find(d => d._id === formData.referredByDoctorId) ? `${doctors.find(d => d._id === formData.referredByDoctorId).name} ${doctors.find(d => d._id === formData.referredByDoctorId).surname}` : 'Doctor' } : null}
-                    onChange={option => setFormData({ ...formData, referredByDoctorId: option ? option.value : '' })}
-                    styles={{ control: (base) => ({ ...base, minHeight: '42px', borderRadius: '8px', borderColor: '#cbd5e1' }) }}
-                    isClearable
-                    menuPosition="fixed"
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar Paciente</button>
+
+                {/* Footer de Acciones */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>
+                    Guardar Paciente
+                  </button>
                 </div>
               </form>
             </div>

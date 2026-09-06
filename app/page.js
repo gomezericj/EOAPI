@@ -10,12 +10,16 @@ import {
   PieChart, 
   Target, 
   AlertCircle,
-  CreditCard,
-  Shield,
-  Building2,
-  HeartPulse,
-  TrendingDown,
-  Receipt
+  CreditCard, 
+  Shield, 
+  Building2, 
+  HeartPulse, 
+  TrendingDown, 
+  Receipt,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  CheckCircle2
 } from 'lucide-react';
 
 import useSWR from 'swr';
@@ -75,7 +79,9 @@ export default function Dashboard() {
     expenses: expensesBreakdown
   };
 
-  const metaProgress = (stats.monthlySales / stats.currentMeta) * 100;
+  const metaProgress = stats.currentMeta > 0 ? (stats.monthlySales / stats.currentMeta) * 100 : 0;
+  const collectionRate = stats.totalSales > 0 ? (stats.chargedPayments / stats.totalSales) * 100 : 0;
+  const netCashFlow = stats.chargedPayments - stats.expenses.total;
 
   const [yearStr, monthStr] = selectedMonth.split('-');
   const selectedYear = parseInt(yearStr);
@@ -86,7 +92,6 @@ export default function Dashboard() {
 
   const isCurrentMonth = selectedYear === currentYear && selectedMonthNum === currentMonthNum;
   const isPastMonth = selectedYear < currentYear || (selectedYear === currentYear && selectedMonthNum < currentMonthNum);
-  const isFutureMonth = selectedYear > currentYear || (selectedYear === currentYear && selectedMonthNum > currentMonthNum);
   
   const totalDaysInMonth = new Date(selectedYear, selectedMonthNum, 0).getDate();
   const passedDays = isPastMonth ? totalDaysInMonth : (isCurrentMonth ? now.getDate() : 0);
@@ -97,324 +102,463 @@ export default function Dashboard() {
   }
   const projectedProgress = stats.currentMeta > 0 ? (projectedSales / stats.currentMeta) * 100 : 0;
 
+  // Lista normalizada de medios de pago para desglose armónico
+  const paymentItems = [
+    { key: 'debito', label: 'Débito', amount: stats.paymentMethods.debito || 0, icon: CreditCard },
+    { key: 'credito', label: 'Crédito', amount: stats.paymentMethods.credito || 0, icon: CreditCard },
+    { key: 'transferencia', label: 'Transferencia', amount: stats.paymentMethods.transferencia || 0, icon: TrendingUp },
+    { key: 'efectivo', label: 'Efectivo', amount: stats.paymentMethods.efectivo || 0, icon: DollarSign },
+    { key: 'isapre', label: 'Isapre', amount: stats.paymentMethods.isapre || 0, icon: Building2 },
+    { key: 'fonasa', label: 'Fonasa', amount: stats.paymentMethods.fonasa || 0, icon: HeartPulse },
+    { key: 'seguro', label: 'Seguros', amount: stats.paymentMethods.seguro || 0, icon: Shield },
+  ];
+
+  // Lista normalizada de egresos
+  const expenseItems = [
+    { key: 'gastoClinica', label: 'Gasto Clínica', amount: stats.expenses.gastoClinica || 0, icon: Building2 },
+    { key: 'valePersonal', label: 'Vale Personal', amount: stats.expenses.valePersonal || 0, icon: Users },
+    { key: 'otro', label: 'Otros Egresos', amount: stats.expenses.otro || 0, icon: Receipt },
+  ];
+
   return (
     <div className="dashboard">
-      <header style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Encabezado Principal */}
+      <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Resumen del Sistema</h1>
-          <p style={{ color: 'var(--text-light)' }}>Monitoreo de actividad clínica y ventas</p>
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 700, color: 'var(--primary)', margin: 0 }}>Panel de Control</h1>
+          <p style={{ color: 'var(--text-light)', margin: '0.25rem 0 0 0', fontSize: '0.9rem' }}>
+            Resumen ejecutivo de recaudación, metas y actividad clínica
+          </p>
         </div>
-        <div>
-          <input 
-            type="month" 
-            className="form-control" 
-            value={selectedMonth} 
-            onChange={(e) => setSelectedMonth(e.target.value)} 
-            style={{ fontWeight: 600 }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#ffffff', border: '1px solid var(--border)', padding: '0.35rem 0.75rem', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+            <Calendar size={16} color="var(--text-light)" />
+            <input 
+              type="month" 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(e.target.value)} 
+              style={{ border: 'none', outline: 'none', background: 'transparent', fontWeight: 600, color: 'var(--text)', fontSize: '0.9rem', cursor: 'pointer' }}
+            />
+          </div>
         </div>
       </header>
 
-      {/* Tarjetas Superiores con Estilo de Cierre Diario */}
-      <div className="stats-grid">
-        {/* Ventas Totales */}
-        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #f59e0b', padding: '1.25rem 1rem' }}>
-          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#fef3c7', color: '#f59e0b', flexShrink: 0 }}>
-            <TrendingUp size={28} />
+      {/* 4 KPIs Superiores con Diseño Minimalista Ejecutivo */}
+      <div className="stats-grid" style={{ gap: '1.25rem' }}>
+        {/* 1. Ventas Totales */}
+        <div className="dash-kpi-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="dash-kpi-label">Ventas Totales</span>
+            <div className="dash-kpi-icon" style={{ backgroundColor: '#f0fdfa', color: '#0d9488' }}>
+              <TrendingUp size={20} />
+            </div>
           </div>
-          <div>
-            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Ventas Totales</small>
-            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800 }}>${stats.totalSales.toLocaleString('es-CL')}</h3>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Acumulado del mes</div>
+          <div className="dash-kpi-value">${stats.totalSales.toLocaleString('es-CL')}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <span className="dash-badge-neutral">
+              Total facturado en el mes
+            </span>
           </div>
         </div>
 
-        {/* Total Recaudado Caja */}
-        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #3b82f6', padding: '1.25rem 1rem' }}>
-          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', flexShrink: 0 }}>
-            <DollarSign size={28} />
+        {/* 2. Total Recaudado en Caja */}
+        <div className="dash-kpi-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="dash-kpi-label">Total Recaudado</span>
+            <div className="dash-kpi-icon" style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+              <DollarSign size={20} />
+            </div>
           </div>
-          <div>
-            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Total Recaudado Caja</small>
-            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#1d4ed8' }}>${stats.chargedPayments.toLocaleString('es-CL')}</h3>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Pagos confirmados</div>
+          <div className="dash-kpi-value">${stats.chargedPayments.toLocaleString('es-CL')}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <span className="dash-badge-success">
+              <CheckCircle2 size={12} style={{ marginRight: '0.25rem' }} />
+              {collectionRate.toFixed(0)}% cobrado
+            </span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>en caja</span>
           </div>
         </div>
 
-        {/* Pendiente de Cobro */}
-        <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '4px solid #ef4444', padding: '1.25rem 1rem' }}>
-          <div style={{ padding: '0.9rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
-            <AlertCircle size={28} />
+        {/* 3. Pendiente de Cobro */}
+        <div className="dash-kpi-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="dash-kpi-label">Por Cobrar</span>
+            <div className="dash-kpi-icon" style={{ backgroundColor: '#fffbeb', color: '#d97706' }}>
+              <AlertCircle size={20} />
+            </div>
           </div>
-          <div>
-            <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Pendiente de Cobro</small>
-            <h3 style={{ margin: '0.2rem 0', fontSize: '1.6rem', fontWeight: 800, color: '#dc2626' }}>${stats.pendingPayments.toLocaleString('es-CL')}</h3>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Abonos pendientes</div>
+          <div className="dash-kpi-value" style={{ color: stats.pendingPayments > 0 ? '#b45309' : 'inherit' }}>
+            ${stats.pendingPayments.toLocaleString('es-CL')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <span className={stats.pendingPayments > 0 ? "dash-badge-warning" : "dash-badge-neutral"}>
+              {stats.pendingPayments > 0 ? 'Abonos pendientes' : 'Al día'}
+            </span>
+            {stats.totalSales > 0 && (
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                {((stats.pendingPayments / stats.totalSales) * 100).toFixed(0)}% del total
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Meta Mes */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', borderLeft: '4px solid #10b981', padding: '1.25rem 1rem' }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <div style={{ padding: '0.85rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', flexShrink: 0 }}>
-              <Target size={26} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <small style={{ color: 'var(--text-light)', fontWeight: 600, fontSize: '0.85rem' }}>Meta Mes</small>
-              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.6rem', fontWeight: 800, color: '#15803d' }}>{metaProgress.toFixed(1)}%</h3>
+        {/* 4. Meta del Mes */}
+        <div className="dash-kpi-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="dash-kpi-label">Meta del Mes</span>
+            <div className="dash-kpi-icon" style={{ backgroundColor: '#f0fdfa', color: 'var(--primary)' }}>
+              <Target size={20} />
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-              <span>Acumulado: <strong>${stats.monthlySales.toLocaleString('es-CL')}</strong></span>
-              <span>Meta: <strong>${stats.currentMeta.toLocaleString('es-CL')}</strong></span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+            <div className="dash-kpi-value" style={{ color: 'var(--primary)' }}>
+              {metaProgress.toFixed(1)}%
             </div>
-            <div style={{ height: '8px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
+              de ${(stats.currentMeta / 1000000).toFixed(1)}M
+            </span>
+          </div>
+          
+          <div style={{ marginTop: '0.5rem' }}>
+            <div style={{ height: '6px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
               {isCurrentMonth && (
-                <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#93c5fd', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+                <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(projectedProgress, 100)}%`, backgroundColor: '#cbd5e1', borderRadius: '4px' }}></div>
               )}
-              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(metaProgress, 100)}%`, backgroundColor: '#10b981', borderRadius: '4px', transition: 'width 1s ease-in-out', zIndex: 1 }}></div>
+              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${Math.min(metaProgress, 100)}%`, backgroundColor: 'var(--primary)', borderRadius: '4px', zIndex: 1 }}></div>
             </div>
             {isCurrentMonth && (
-              <div style={{ marginTop: '0.6rem', fontSize: '0.72rem', textAlign: 'center', backgroundColor: '#f8fafc', padding: '0.4rem', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                <span style={{ color: 'var(--text)' }}>
-                  Proyección a fin de mes: <strong style={{ fontSize: '0.95rem' }}>${Math.round(projectedSales).toLocaleString('es-CL')}</strong>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '0.35rem', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Proy: ${Math.round(projectedSales / 1000000).toFixed(1)}M</span>
+                <span style={{ fontWeight: 600, color: projectedSales >= stats.currentMeta ? 'var(--success)' : '#d97706' }}>
+                  {projectedSales >= stats.currentMeta ? '↑ A ritmo' : '↓ Bajo ritmo'}
                 </span>
-                <br/>
-                {projectedSales >= stats.currentMeta ? (
-                  <span style={{ color: 'var(--success)', fontWeight: 600 }}>↑ Con este ritmo se logrará la meta</span>
-                ) : (
-                  <span style={{ color: 'var(--danger)', fontWeight: 600 }}>↓ Ritmo actual por debajo de la meta</span>
-                )}
               </div>
             )}
           </div>
         </div>
       </div>
-      
-      {/* Ingresos por Medio de Pago en el Dashboard con estilo de Cierre Diario */}
-      <div className="card" style={{ marginTop: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-          <PieChart size={20} color="var(--primary)" />
-          <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
-            Ingresos por Medio de Pago
-          </h3>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-          {/* Fila Superior: Medios Directos (4 columnas) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem' }}>
-            {/* Efectivo */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #10b981', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#10b981', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', flexShrink: 0 }}>
-                <DollarSign size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Efectivo</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.efectivo || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
 
-            {/* Débito */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #3b82f6', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#3b82f6', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#3b82f6', flexShrink: 0 }}>
-                <CreditCard size={20} />
+      {/* Sección Bento: Balance Financiero y Distribución (Ingresos vs Egresos) */}
+      <div className="dash-bento-grid" style={{ marginTop: '1.75rem' }}>
+        {/* Columna Izquierda: Ingresos por Medio de Pago */}
+        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ padding: '0.45rem', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--primary)', border: '1px solid #e2e8f0' }}>
+                <PieChart size={18} />
               </div>
               <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Débito</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.debito || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
-
-            {/* Crédito */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #6366f1', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#6366f1', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#eef2ff', color: '#6366f1', flexShrink: 0 }}>
-                <CreditCard size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Crédito</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.credito || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
-
-            {/* Transferencia */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #f59e0b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f59e0b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#f59e0b', flexShrink: 0 }}>
-                <TrendingUp size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Transferencia</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.transferencia || 0).toLocaleString('es-CL')}</h3>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+                  Ingresos por Medio de Pago
+                </h3>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.78rem' }}>
+                  Distribución de los ${stats.chargedPayments.toLocaleString('es-CL')} recaudados
+                </small>
               </div>
             </div>
           </div>
 
-          {/* Fila Inferior: Previsión y Coberturas (3 columnas simétricas) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.85rem' }}>
-            {/* Seguro */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #8b5cf6', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#8b5cf6', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f5f3ff', color: '#8b5cf6', flexShrink: 0 }}>
-                <Shield size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Seguro</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.seguro || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.85rem' }}>
+            {paymentItems.map((item) => {
+              const IconComp = item.icon;
+              const pct = stats.chargedPayments > 0 ? Math.round((item.amount / stats.chargedPayments) * 100) : 0;
+              return (
+                <div key={item.key} className="dash-distribution-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <IconComp size={15} color="var(--text-light)" />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>{item.label}</span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-light)' }}>{pct}%</span>
+                  </div>
+                  
+                  <div style={{ margin: '0.45rem 0 0.4rem 0', fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
+                    ${item.amount.toLocaleString('es-CL')}
+                  </div>
 
-            {/* Isapre */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #0284c7', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#0284c7', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f9ff', color: '#0284c7', flexShrink: 0 }}>
-                <Building2 size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Isapre</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.isapre || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
-
-            {/* Fonasa */}
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '4px solid #0d9488', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#0d9488', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-              <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0fdfa', color: '#0d9488', flexShrink: 0 }}>
-                <HeartPulse size={20} />
-              </div>
-              <div>
-                <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600 }}>Fonasa</small>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>${(stats.paymentMethods.fonasa || 0).toLocaleString('es-CL')}</h3>
-              </div>
-            </div>
+                  <div style={{ height: '4px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, backgroundColor: 'var(--secondary)', borderRadius: '3px', transition: 'width 0.4s ease' }}></div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Desglose de Gastos (Egresos) en el Dashboard con estilo de Cierre Diario */}
-      <div className="card" style={{ marginTop: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-          <AlertCircle size={20} color="#ef4444" />
-          <h3 style={{ margin: 0, textTransform: 'capitalize' }}>
-            Desglose de Egresos
-          </h3>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
-          {/* Total Gastos */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #dc2626', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2', borderTopWidth: '4px', borderTopColor: '#dc2626', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', flexShrink: 0 }}>
-              <TrendingDown size={22} />
-            </div>
-            <div>
-              <small style={{ color: '#991b1b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Total Gastos</small>
-              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.15rem', color: '#dc2626', fontWeight: 800 }}>${(stats.expenses.total || 0).toLocaleString('es-CL')}</h3>
+        {/* Columna Derecha: Flujo de Caja y Control de Egresos */}
+        <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ padding: '0.45rem', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--primary)', border: '1px solid #e2e8f0' }}>
+                <Wallet size={18} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+                  Flujo de Caja y Egresos
+                </h3>
+                <small style={{ color: 'var(--text-light)', fontSize: '0.78rem' }}>
+                  Balance neto y desglose de salidas
+                </small>
+              </div>
             </div>
           </div>
 
-          {/* Vale Personal */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #f97316', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#f97316', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#ffedd5', color: '#ea580c', flexShrink: 0 }}>
-              <Users size={20} />
-            </div>
+          {/* Banner Resumen de Flujo Neto */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            padding: '0.9rem 1.1rem', 
+            borderRadius: '10px', 
+            backgroundColor: netCashFlow >= 0 ? '#f0fdf4' : '#fff1f2', 
+            border: netCashFlow >= 0 ? '1px solid #dcfce7' : '1px solid #ffe4e6',
+            marginBottom: '1rem'
+          }}>
             <div>
-              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Vale Personal</small>
-              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.valePersonal || 0).toLocaleString('es-CL')}</h3>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: netCashFlow >= 0 ? '#166534' : '#9f1239', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Flujo Neto en Caja
+              </span>
+              <div style={{ fontSize: '1.35rem', fontWeight: 800, color: netCashFlow >= 0 ? '#15803d' : '#be123c', marginTop: '0.1rem' }}>
+                ${netCashFlow.toLocaleString('es-CL')}
+              </div>
+              <small style={{ fontSize: '0.72rem', color: netCashFlow >= 0 ? '#166534' : '#9f1239' }}>
+                Recaudado menos egresos del periodo
+              </small>
+            </div>
+            <div style={{ 
+              padding: '0.65rem', 
+              borderRadius: '50%', 
+              backgroundColor: netCashFlow >= 0 ? '#dcfce7' : '#ffe4e6', 
+              color: netCashFlow >= 0 ? '#15803d' : '#be123c' 
+            }}>
+              {netCashFlow >= 0 ? <ArrowUpRight size={22} /> : <ArrowDownRight size={22} />}
             </div>
           </div>
 
-          {/* Gasto Clínica */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #ef4444', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#ef4444', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', flexShrink: 0 }}>
-              <Building2 size={20} />
+          {/* Desglose de Gastos */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', flex: 1 }}>
+            {/* Total Egresos Barra Resumen */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <TrendingDown size={16} color="#dc2626" />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0f172a' }}>Total Egresos</span>
+              </div>
+              <span style={{ fontSize: '1rem', fontWeight: 700, color: '#dc2626' }}>
+                -${stats.expenses.total.toLocaleString('es-CL')}
+              </span>
             </div>
-            <div>
-              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Gasto Clínica</small>
-              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.gastoClinica || 0).toLocaleString('es-CL')}</h3>
-            </div>
-          </div>
 
-          {/* Otro */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderTop: '4px solid #64748b', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', borderTopWidth: '4px', borderTopColor: '#64748b', padding: '0.95rem 0.85rem', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', flexShrink: 0 }}>
-              <Receipt size={20} />
-            </div>
-            <div>
-              <small style={{ color: 'var(--text-light)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Otro</small>
-              <h3 style={{ margin: '0.15rem 0 0', fontSize: '1.1rem', color: '#1e293b', fontWeight: 700 }}>${(stats.expenses.otro || 0).toLocaleString('es-CL')}</h3>
+            {/* Categorías de Egresos */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem', marginTop: '0.25rem' }}>
+              {expenseItems.map((item) => {
+                const IconComp = item.icon;
+                const expPct = stats.expenses.total > 0 ? Math.round((item.amount / stats.expenses.total) * 100) : 0;
+                return (
+                  <div key={item.key} className="dash-distribution-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-light)' }}>{item.label}</span>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-light)' }}>{expPct}%</span>
+                    </div>
+                    <div style={{ margin: '0.35rem 0 0.35rem 0', fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
+                      ${item.amount.toLocaleString('es-CL')}
+                    </div>
+                    <div style={{ height: '3px', width: '100%', backgroundColor: '#f1f5f9', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${expPct}%`, backgroundColor: '#94a3b8', borderRadius: '2px' }}></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="responsive-grid-2-1" style={{ marginTop: '2rem' }}>
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ margin: 0 }}>Ventas Recientes</h3>
-            <Link href="/ventas" style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+      {/* Fila Inferior: Ventas Recientes y Acceso Rápido */}
+      <div className="responsive-grid-2-1" style={{ marginTop: '1.75rem' }}>
+        {/* Tabla Ventas Recientes */}
+        <div className="card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>Ventas Recientes</h3>
+              <small style={{ color: 'var(--text-light)', fontSize: '0.78rem' }}>Últimas transacciones registradas</small>
+            </div>
+            <Link href="/ventas" style={{ color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
               Ver Todas <ChevronRight size={16} />
             </Link>
           </div>
-          <div className="table-container" style={{ border: 'none' }}>
+          <div className="table-container" style={{ border: 'none', boxShadow: 'none' }}>
             <table>
               <thead>
                 <tr>
-                  <th>Fecha</th>
-                  <th>Paciente</th>
-                  <th>Total</th>
-                  <th>Estado</th>
+                  <th style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600 }}>Fecha</th>
+                  <th style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600 }}>Paciente</th>
+                  <th style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600 }}>Total</th>
+                  <th style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600, textAlign: 'right' }}>Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {stats.recentSales.length > 0 ? stats.recentSales.map((s) => (
-                  <tr key={s._id}>
-                    <td>{new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
-                    <td>{s.patientId?.name} {s.patientId?.surname}</td>
-                    <td style={{ fontWeight: 600 }}>${(s.totalToCollect || 0).toLocaleString('es-CL')}</td>
-                    <td>
+                  <tr key={s._id} style={{ transition: 'background-color 0.15s ease' }}>
+                    <td style={{ fontSize: '0.85rem' }}>{new Date(s.date).toLocaleDateString('es-CL', { timeZone: 'UTC' })}</td>
+                    <td style={{ fontSize: '0.85rem', fontWeight: 500 }}>{s.patientId?.name} {s.patientId?.surname}</td>
+                    <td style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>${(s.totalToCollect || 0).toLocaleString('es-CL')}</td>
+                    <td style={{ textAlign: 'right' }}>
                       <span style={{
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '10px',
+                        display: 'inline-block',
+                        padding: '0.2rem 0.55rem',
+                        borderRadius: '6px',
                         fontSize: '0.7rem',
                         fontWeight: 700,
-                        backgroundColor: s.status === 'pagada' ? '#d1fae5' : '#fee2e2',
-                        color: s.status === 'pagada' ? '#065f46' : '#991b1b'
-                      }}>{(s.status || 'PENDIENTE').toUpperCase()}</span>
+                        backgroundColor: s.status === 'pagada' ? '#f0fdf4' : '#fffbeb',
+                        color: s.status === 'pagada' ? '#166534' : '#b45309',
+                        border: s.status === 'pagada' ? '1px solid #dcfce7' : '1px solid #fef3c7'
+                      }}>
+                        {(s.status || 'PENDIENTE').toUpperCase()}
+                      </span>
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="4" style={{ textAlign: 'center' }}>No hay ventas recientes</td></tr>
+                  <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--text-light)' }}>No hay ventas registradas este mes</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="card" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
-          <h3 style={{ color: 'white' }}>Acceso Rápido</h3>
-          <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <li>
-              <Link href="/ventas" className="btn dashboard-quick-btn">
-                <DollarSign size={18} /> Registrar Nueva Venta
+        {/* Acceso Rápido Ejecutivo */}
+        <div className="card" style={{ background: 'linear-gradient(145deg, #025158 0%, #033c41 100%)', color: 'white', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Acceso Rápido</h3>
+            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem', margin: '0.25rem 0 1.25rem 0' }}>Acciones operativas del día</p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <Link href="/ventas" className="dash-action-btn">
+                <DollarSign size={16} /> Registrar Venta
               </Link>
-            </li>
-            <li>
-              <Link href="/cierres" className="btn dashboard-quick-btn">
-                <Calendar size={18} /> Realizar Cierre Diario
+              <Link href="/cierres" className="dash-action-btn">
+                <Calendar size={16} /> Cierre Diario
               </Link>
-            </li>
-            <li>
-              <Link href="/comisiones" className="btn dashboard-quick-btn">
-                <PieChart size={18} /> Ver Comisiones de Mes
+              <Link href="/comisiones" className="dash-action-btn">
+                <PieChart size={16} /> Comisiones Médicas
               </Link>
-            </li>
-          </ul>
+            </div>
+          </div>
           
-          <div style={{ marginTop: '2.5rem', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}>
-            <h4 style={{ color: 'white', margin: 0, fontSize: '0.9rem' }}>Estado del Servidor</h4>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: '#4ade80', fontSize: '0.8rem' }}>
-              <div className="status-pulse-dashboard"></div>
-              Conectado a MongoDB
+          <div style={{ marginTop: '2rem', padding: '1rem 1.2rem', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', fontWeight: 500 }}>Base de Datos</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#4ade80', fontSize: '0.78rem', fontWeight: 600 }}>
+                <div className="status-pulse-dashboard"></div>
+                En Línea
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <style jsx global>{`
+        .dash-kpi-card {
+          background: #ffffff;
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.25rem;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dash-kpi-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px -2px rgba(0,0,0,0.06);
+        }
+        .dash-kpi-label {
+          color: var(--text-light);
+          font-size: 0.82rem;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+        }
+        .dash-kpi-value {
+          margin: 0.5rem 0 0 0;
+          font-size: 1.7rem;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: -0.5px;
+        }
+        .dash-kpi-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .dash-badge-neutral {
+          font-size: 0.72rem;
+          color: var(--text-light);
+          background-color: #f8fafc;
+          border: 1px solid #e2e8f0;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          font-weight: 500;
+        }
+        .dash-badge-success {
+          font-size: 0.72rem;
+          color: #166534;
+          background-color: #f0fdf4;
+          border: 1px solid #dcfce7;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+        }
+        .dash-badge-warning {
+          font-size: 0.72rem;
+          color: #b45309;
+          background-color: #fffbeb;
+          border: 1px solid #fef3c7;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+        .dash-bento-grid {
+          display: grid;
+          grid-template-columns: 1.25fr 1fr;
+          gap: 1.25rem;
+        }
+        @media (max-width: 1024px) {
+          .dash-bento-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .dash-distribution-card {
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          padding: 0.85rem;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dash-distribution-card:hover {
+          border-color: #cbd5e1;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .dash-action-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: white;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+        .dash-action-btn:hover {
+          background: rgba(255, 255, 255, 0.18);
+          transform: translateX(3px);
+          border-color: rgba(255, 255, 255, 0.3);
+        }
         .status-pulse-dashboard {
           width: 8px;
           height: 8px;

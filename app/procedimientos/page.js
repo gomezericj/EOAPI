@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, ClipboardList, DollarSign, Trash2, Edit, Download, ToggleLeft, ToggleRight, X } from 'lucide-react';
+import { Plus, Search, ClipboardList, DollarSign, Trash2, Edit, Download, ToggleLeft, ToggleRight, X, Package, Percent } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 import * as XLSX from 'xlsx';
 import { useSession } from 'next-auth/react';
@@ -226,163 +226,253 @@ export default function ProceduresPage() {
       {showModal && (
         <Portal>
           <div className="modal-overlay">
-            <div className="card" style={{ width: '500px', position: 'relative' }}>
-              <button 
-                type="button"
-                onClick={() => setShowModal(false)}
-                style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-light)', zIndex: 10 }}
-              >
-                <X size={20} />
-              </button>
-              <h2>{formData._id ? 'Editar Procedimiento' : 'Registrar Procedimiento'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Nombre del Procedimiento</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    placeholder="Ej: Limpieza Dental"
-                  />
+            <div className="card" style={{ width: '620px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', borderRadius: '16px' }}>
+              
+              {/* Encabezado */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ClipboardList size={20} />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formData._id ? 'Editar Procedimiento' : 'Registrar Procedimiento'}
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-light)' }}>
+                      Configuración del catálogo clínico, tarifas base y estructura de costos.
+                    </p>
+                  </div>
                 </div>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  title="Cerrar" 
+                  style={{ 
+                    width: '34px', 
+                    height: '34px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    color: 'var(--text-light)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
 
-                <div className="form-group">
-                  <label className="form-label">Especialidad</label>
-                  <select
-                    className="form-control"
-                    value={formData.specialty}
-                    onChange={e => setFormData({ ...formData, specialty: e.target.value })}
-                  >
-                    <option value="">Seleccionar Especialidad</option>
-                    {specialties.map(spec => (
-                      <option key={spec._id} value={spec.name}>
-                        {spec.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Precio ($)</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={formData.price}
-                    onChange={e => setFormData({ ...formData, price: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <hr style={{ margin: '1.5rem 0', borderColor: 'var(--border)' }} />
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Estructura de Costos Fijos</h3>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Admin (%)</label>
+                {/* Bloque 1: Datos Principales */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                      Nombre del Procedimiento
+                    </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      value={formData.costs?.adminPercentage || 0}
-                      onChange={e => setFormData({ ...formData, costs: { ...formData.costs, adminPercentage: Number(e.target.value) } })}
-                      min="0" max="100"
-                      disabled={!isAdmin}
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      placeholder="Ej: Profilaxis y Destartraje"
+                      style={{ marginBottom: 0 }}
                     />
                   </div>
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Instalaciones (%)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      value={formData.costs?.facilityPercentage || 0}
-                      onChange={e => setFormData({ ...formData, costs: { ...formData.costs, facilityPercentage: Number(e.target.value) } })}
-                      min="0" max="100"
-                      disabled={!isAdmin}
-                    />
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Especialidad</label>
+                      <select
+                        className="form-control"
+                        value={formData.specialty}
+                        onChange={e => setFormData({ ...formData, specialty: e.target.value })}
+                        style={{ marginBottom: 0 }}
+                      >
+                        <option value="">Seleccionar Especialidad...</option>
+                        {specialties.map(spec => (
+                          <option key={spec._id} value={spec.name}>
+                            {spec.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Precio Lista ($)</label>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ padding: '0 0.65rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRight: 'none', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', fontWeight: 700, color: '#64748b' }}>$</span>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.price}
+                          onChange={e => setFormData({ ...formData, price: e.target.value })}
+                          required
+                          placeholder="0"
+                          style={{ margin: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Insumos y Equipos</label>
-                  {formData.costs?.suppliesAndEquipment?.map((item, index) => (
-                    <div key={index} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Nombre del insumo"
-                        value={item.name}
-                        onChange={e => {
-                          const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
-                          newSupplies[index].name = e.target.value;
-                          setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
-                        }}
-                        style={{ flex: 2 }}
-                        required
-                        disabled={!isAdmin}
-                      />
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Costo"
-                        value={item.price}
-                        onChange={e => {
-                          const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
-                          newSupplies[index].price = Number(e.target.value);
-                          setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
-                        }}
-                        style={{ flex: 1 }}
-                        required
-                        min="0"
-                        disabled={!isAdmin}
-                      />
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Cant."
-                        value={item.quantity}
-                        onChange={e => {
-                          const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
-                          newSupplies[index].quantity = Number(e.target.value);
-                          setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
-                        }}
-                        style={{ flex: 1, maxWidth: '80px' }}
-                        required
-                        min="1"
-                        disabled={!isAdmin}
-                      />
-                      {isAdmin && (
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            const newSupplies = formData.costs.suppliesAndEquipment.filter((_, i) => i !== index);
-                            setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
-                          }}
-                          style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', padding: '0 0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
+                {/* Bloque 2: Estructura de Costos Fijos */}
+                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '6px', backgroundColor: '#f0fdfa', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Percent size={14} />
                     </div>
-                  ))}
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => {
-                        const newSupplies = [...(formData.costs?.suppliesAndEquipment || []), { name: '', price: 0, quantity: 1 }];
-                        setFormData({ ...formData, costs: { ...(formData.costs || {}), adminPercentage: formData.costs?.adminPercentage || 0, facilityPercentage: formData.costs?.facilityPercentage || 0, suppliesAndEquipment: newSupplies } });
-                      }}
-                      style={{ fontSize: '0.85rem', padding: '0.4rem 0.8rem', marginTop: '0.5rem', border: '1px dashed var(--border)', width: '100%', display: 'flex', justifyContent: 'center' }}
-                    >
-                      + Agregar Insumo/Equipo
-                    </button>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)' }}>
+                        Estructura de Costos Fijos
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>
+                        Porcentajes imputables a administración e infraestructura clínica
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Administración (%)</label>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.costs?.adminPercentage || 0}
+                          onChange={e => setFormData({ ...formData, costs: { ...formData.costs, adminPercentage: Number(e.target.value) } })}
+                          min="0" max="100"
+                          disabled={!isAdmin}
+                          style={{ margin: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                        />
+                        <span style={{ padding: '0 0.65rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderLeft: 'none', borderTopRightRadius: '8px', borderBottomRightRadius: '8px', fontWeight: 700, color: '#64748b', fontSize: '0.8rem' }}>%</span>
+                      </div>
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Instalaciones (%)</label>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.costs?.facilityPercentage || 0}
+                          onChange={e => setFormData({ ...formData, costs: { ...formData.costs, facilityPercentage: Number(e.target.value) } })}
+                          min="0" max="100"
+                          disabled={!isAdmin}
+                          style={{ margin: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                        />
+                        <span style={{ padding: '0 0.65rem', height: '40px', display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderLeft: 'none', borderTopRightRadius: '8px', borderBottomRightRadius: '8px', fontWeight: 700, color: '#64748b', fontSize: '0.8rem' }}>%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bloque 3: Insumos y Equipos Requeridos */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ width: '26px', height: '26px', borderRadius: '6px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Package size={14} />
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#334155' }}>
+                          Insumos y Equipos Requeridos
+                        </div>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Materiales específicos consumidos</span>
+                      </div>
+                    </div>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => {
+                          const newSupplies = [...(formData.costs?.suppliesAndEquipment || []), { name: '', price: 0, quantity: 1 }];
+                          setFormData({ ...formData, costs: { ...(formData.costs || {}), adminPercentage: formData.costs?.adminPercentage || 0, facilityPercentage: formData.costs?.facilityPercentage || 0, suppliesAndEquipment: newSupplies } });
+                        }}
+                        style={{ fontSize: '0.76rem', padding: '0.35rem 0.65rem', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', borderRadius: '8px', color: 'var(--primary)', fontWeight: 600 }}
+                      >
+                        + Agregar Insumo
+                      </button>
+                    )}
+                  </div>
+
+                  {(!formData.costs?.suppliesAndEquipment || formData.costs.suppliesAndEquipment.length === 0) ? (
+                    <div style={{ padding: '1rem', textAlign: 'center', backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', color: 'var(--text-light)', fontSize: '0.78rem' }}>
+                      No se han vinculado insumos específicos a este procedimiento.
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {formData.costs.suppliesAndEquipment.map((item, index) => (
+                        <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px auto', gap: '0.5rem', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.5rem', borderRadius: '8px' }}>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Nombre del insumo"
+                            value={item.name}
+                            onChange={e => {
+                              const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
+                              newSupplies[index].name = e.target.value;
+                              setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
+                            }}
+                            style={{ margin: 0, fontSize: '0.82rem' }}
+                            required
+                            disabled={!isAdmin}
+                          />
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Costo $"
+                            value={item.price}
+                            onChange={e => {
+                              const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
+                              newSupplies[index].price = Number(e.target.value);
+                              setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
+                            }}
+                            style={{ margin: 0, fontSize: '0.82rem' }}
+                            required
+                            min="0"
+                            disabled={!isAdmin}
+                          />
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Cant."
+                            value={item.quantity}
+                            onChange={e => {
+                              const newSupplies = [...(formData.costs?.suppliesAndEquipment || [])];
+                              newSupplies[index].quantity = Number(e.target.value);
+                              setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
+                            }}
+                            style={{ margin: 0, fontSize: '0.82rem', textAlign: 'center' }}
+                            required
+                            min="1"
+                            disabled={!isAdmin}
+                          />
+                          {isAdmin && (
+                            <button 
+                              type="button" 
+                              onClick={() => {
+                                const newSupplies = formData.costs.suppliesAndEquipment.filter((_, i) => i !== index);
+                                setFormData({ ...formData, costs: { ...formData.costs, suppliesAndEquipment: newSupplies } });
+                              }}
+                              style={{ backgroundColor: 'transparent', color: '#ef4444', border: 'none', padding: '0.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              title="Eliminar insumo"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid var(--border)' }}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar</button>
+                {/* Footer de Acciones */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ border: '1px solid #cbd5e1', backgroundColor: '#ffffff' }}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>Guardar Procedimiento</button>
                 </div>
               </form>
             </div>
